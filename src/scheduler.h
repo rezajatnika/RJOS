@@ -73,4 +73,14 @@ void sched_destroy(sched_t *sched);
  */
 uint32_t millis(void);
 
+/**
+ * @brief Returns true if a shutdown signal has been received.
+ */
+int sched_should_exit(void);
+
+/**
+ * @brief Installs signal handlers for graceful shutdown.
+ */
+void sched_setup_signal_handlers(void);
+
 #endif

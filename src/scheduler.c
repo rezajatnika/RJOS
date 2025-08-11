@@ -1,9 +1,16 @@
 #include "scheduler.h"
 
+#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 #include <unistd.h>
+
+static volatile sig_atomic_t shutdown_requested = 0;
+
+static void handle_signal(int sig) {
+    shutdown_requested = 1;
+}
 
 /**
  * @brief Gets the current time in millisecond.
@@ -42,7 +49,7 @@ int sched_add_task(sched_t *sched, task_fn fn, void *data, uint32_t interval_ms)
 
 void sched_start(sched_t *sched) {
     sched->running = 1;
-    while (sched->running) {
+    while (!sched_should_exit()) {
         uint32_t now_ms = current_time_ms();
         for (size_t i = 0; i < sched->tasks_count; i++) {
             sched_task_t *task = &sched->tasks[i];
@@ -74,4 +81,18 @@ uint32_t millis(void) {
         start_ms = now_ms;
     }
     return now_ms - start_ms;
+}
+
+int sched_should_exit(void) {
+    return shutdown_requested;
+}
+
+void sched_setup_signal_handlers(void) {
+    struct sigaction sa = {
+        .sa_handler = handle_signal,
+        .sa_flags = 0,
+    };
+    sigemptyset(&sa.sa_mask);
+    sigaction(SIGINT, &sa, NULL);
+    sigaction(SIGTERM, &sa, NULL);
 }
