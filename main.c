@@ -12,9 +12,6 @@ void ex_task(void *data) {
 }
 
 int main(void) {
-    FILE *logf = fopen("log.txt", "w");
-    fclose(logf);
-
     sched_t sched;
     sched_init(&sched, 4);
     sched_add_task(&sched, ex_task, NULL, 1000);
