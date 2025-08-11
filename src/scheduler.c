@@ -60,6 +60,11 @@ void sched_start(sched_t *sched) {
             if (elapsed_ms >= task->interval_ms) {
                 task->callback(task->data);
                 task->last_run_ms = now_ms;
+
+                /* Call logging hook if set. */
+                if (sched->log_hook) {
+                    sched->log_hook(i, task->data);
+                }
             } else {
                 uint32_t diff_ms = task->interval_ms - elapsed_ms;
                 if (diff_ms < next_due_ms) {
@@ -86,6 +91,12 @@ void sched_destroy(sched_t *sched) {
     free(sched->tasks);
     sched->tasks = NULL;
     sched->tasks_count = 0;
+}
+
+void sched_set_log_hook(sched_t *sched, sched_log_fn *log_hook) {
+    if (sched) {
+        sched->log_hook = log_hook;
+    }
 }
 
 uint32_t millis(void) {

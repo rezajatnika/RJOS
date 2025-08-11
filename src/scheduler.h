@@ -5,6 +5,7 @@
 #include <stddef.h>
 
 typedef void (*task_fn)(void *data);
+typedef void (*sched_log_fn)(size_t idx, void *data);
 
 /**
  * @brief Represents a single scheduled task.
@@ -24,6 +25,7 @@ typedef struct {
     size_t max_tasks;
     size_t tasks_count;
     int running;
+    sched_log_fn log_hook;
 } sched_t;
 
 /**
@@ -66,6 +68,13 @@ void sched_stop(sched_t *sched);
  * @param sched Pointer to the scheduler.
  */
 void sched_destroy(sched_t *sched);
+
+/**
+ *
+ * @param sched
+ * @param log_hook
+ */
+void sched_set_log_hook(sched_t *sched, sched_log_fn *log_hook);
 
 /**
  * @brief Returns the current time in milliseconds since system start.
