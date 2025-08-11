@@ -51,14 +51,30 @@ void sched_start(sched_t *sched) {
     sched->running = 1;
     while (!sched_should_exit()) {
         uint32_t now_ms = current_time_ms();
+        uint32_t next_due_ms = UINT32_MAX;
+
         for (size_t i = 0; i < sched->tasks_count; i++) {
             sched_task_t *task = &sched->tasks[i];
-            if (now_ms - task->last_run_ms >= task->interval_ms) {
+
+            uint32_t elapsed_ms = now_ms - task->last_run_ms;
+            if (elapsed_ms >= task->interval_ms) {
                 task->callback(task->data);
                 task->last_run_ms = now_ms;
+            } else {
+                uint32_t diff_ms = task->interval_ms - elapsed_ms;
+                if (diff_ms < next_due_ms) {
+                    next_due_ms = diff_ms;
+                }
             }
         }
-        usleep(1000); /* Sleep 1ms to reduce CPU usage. */
+        /* Sleep until next task is due, or default to 1ms. */
+        uint32_t sleep_ms;
+        if (next_due_ms == UINT32_MAX) {
+            sleep_ms = 1;
+        } else {
+            sleep_ms = next_due_ms;
+        }
+        usleep(sleep_ms * 1000);
     }
 }
 

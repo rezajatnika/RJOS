@@ -18,7 +18,7 @@ int main(void) {
     sched_t sched;
     sched_init(&sched, 4);
     sched_add_task(&sched, print_hello, "1000", 1000);
-    sched_add_task(&sched, log_hello, logf, 1000);
+    sched_add_task(&sched, log_hello, logf, 500);
 
     sched_setup_signal_handlers();
     sched_start(&sched);
