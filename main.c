@@ -21,7 +21,6 @@ int main(void) {
     sched_start(&sched);
 
     printf("[%d] Shutdown requested at: %dms after start.\n", millis(), millis());
-    fclose(logf);
     sched_destroy(&sched);
     return 0;
 }
