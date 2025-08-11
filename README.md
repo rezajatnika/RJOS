@@ -8,3 +8,7 @@ reliability, and real-time responsiveness.
 - **Task Scheduler**: A high-precision, interval-based scheduler for managing recurring tasks. 
 Supports modular task definitions, configurable execution intervals, and efficient CPU usage for 
 real-time systems.
+
+## Design Philosophy
+- **Bare-metal simplicity**: No unnecessary abstractions—just the essentials for predictable,
+continuous operation.
