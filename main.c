@@ -2,7 +2,7 @@
 #include "src/scheduler.h"
 
 void print_hello(void *data) {
-    printf("Hello every %s ms.\n", (char*)data);
+    printf("[%d] Hello every %s ms.\n", millis(), (char*)data);
 }
 
 int main(void) {
