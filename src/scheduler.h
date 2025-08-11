@@ -67,4 +67,10 @@ void sched_stop(sched_t *sched);
  */
 void sched_destroy(sched_t *sched);
 
+/**
+ * @brief Returns the current time in milliseconds since system start.
+ * @return Current time in milliseconds.
+ */
+uint32_t millis(void);
+
 #endif
