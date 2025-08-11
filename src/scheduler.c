@@ -73,5 +73,5 @@ uint32_t millis(void) {
     if (start_ms == 0) {
         start_ms = now_ms;
     }
-    return (uint32_t)(now_ms - start_ms);
+    return now_ms - start_ms;
 }
