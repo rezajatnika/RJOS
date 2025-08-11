@@ -1,14 +1,14 @@
 #include <stdio.h>
 #include "src/scheduler.h"
 
-void print_hello(void *data) {
-    printf("[%d] Hello every %sms.\n", millis(), (char*)data);
+void ex_logger(size_t index, void *data) {
+    printf("[RJOS] Task %zu executed. Data: %p\n", index, data);
 }
 
-void log_hello(void *data) {
-    FILE *log_file = (FILE*)data;
-    log_file = fopen("log.txt", "a");
-    fprintf(log_file, "[%d] Hello every %sms.\n", millis(), "1000");
+void ex_task(void *data) {
+    for (int i = 0; i < 10; i++) {
+        __asm__ __volatile__("nop");
+    }
 }
 
 int main(void) {
@@ -17,8 +17,8 @@ int main(void) {
 
     sched_t sched;
     sched_init(&sched, 4);
-    sched_add_task(&sched, print_hello, "1000", 1000);
-    sched_add_task(&sched, log_hello, logf, 500);
+    sched_add_task(&sched, ex_task, NULL, 1000);
+    sched_set_log_hook(&sched, ex_logger);
 
     sched_setup_signal_handlers();
     sched_start(&sched);
