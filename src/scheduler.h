@@ -10,13 +10,18 @@ typedef void (*sched_log_fn)(size_t idx, void *data);
 /**
  * @brief Represents a single scheduled task.
  */
-typedef struct {
+typedef struct sched_task {
     const char *name;
     task_fn callback;       /**< Function to execute */
     void *data;             /**< Arguments of the function to execute */
     uint32_t interval_ms;   /**< Execution interval in milliseconds */
     uint32_t last_run_ms;   /**< Timestamp of last execution */
     uint8_t priority;       /**< 0 = Lowest, 255 = Highest */
+
+    /* Profiling fields. */
+    uint32_t run_count;
+    uint32_t total_duration_ms;
+    uint32_t max_duration_ms;
 } sched_task_t;
 
 /**
@@ -51,7 +56,7 @@ int sched_init(sched_t *sched, size_t max_tasks);
  * @param interval_ms Interval in milliseconds between executions.
  * @return 0 on success, -1 if task list if full.
  */
-int sched_add_task(sched_t *sched, task_fn fn, void *data, uint32_t interval_ms, uint8_t priority);
+int sched_add_task(sched_t *sched, task_fn fn, void *data, uint32_t interval_ms, uint8_t priority, char *name);
 
 /**
  * @brief Starts the scheduler loop once.
@@ -87,5 +92,17 @@ int sched_should_exit(void);
  * @brief Installs signal handlers for graceful shutdown.
  */
 void sched_setup_signal_handlers(void);
+
+/**
+ *
+ * @param task
+ * @return
+ */
+static inline uint32_t sched_avg_ms(sched_task_t *task) {
+    if (task->run_count) {
+        return task->total_duration_ms / task->run_count;
+    }
+    return 0;
+}
 
 #endif

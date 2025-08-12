@@ -46,7 +46,7 @@ int sched_init(sched_t *sched, size_t max_tasks) {
     return 0;
 }
 
-int sched_add_task(sched_t *sched, task_fn fn, void *data, uint32_t interval_ms, uint8_t priority) {
+int sched_add_task(sched_t *sched, task_fn fn, void *data, uint32_t interval_ms, uint8_t priority, char *name) {
     if (!sched || !fn || sched->tasks_count >= sched->max_tasks) {
         perror("sched_add_task");
         return -1;
@@ -54,7 +54,7 @@ int sched_add_task(sched_t *sched, task_fn fn, void *data, uint32_t interval_ms,
     sched_task_t *task = &sched->tasks[sched->tasks_count++];
     task->callback = fn;
     task->data = data;
-    task->name = "Task";
+    task->name = name;
     task->interval_ms = interval_ms;
     task->last_run_ms = current_time_ms();
     task->priority = priority;
@@ -74,8 +74,16 @@ void sched_start(sched_t *sched) {
 
             uint32_t elapsed_ms = now_ms - task->last_run_ms;
             if (elapsed_ms >= task->interval_ms) {
+                uint32_t start = current_time_ms();
                 task->callback(task->data);
+                uint32_t duration = current_time_ms() - start;
                 task->last_run_ms = now_ms;
+
+                task->run_count++;
+                task->total_duration_ms += duration;
+                if (duration > task->max_duration_ms) {
+                    task->max_duration_ms = duration;
+                }
 
                 /* Call logging hook if set. */
                 if (sched->log_hook) {
