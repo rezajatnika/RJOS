@@ -29,8 +29,8 @@ int main(void) {
     udp_init(&udp, "127.0.0.1", 8000);
 
     sched_add_task(&sched, ex_task, "1234", 1000, 255);
-    sched_add_task(&sched, ex_udp, &udp, 1000, 255);
-    sched_set_log_hook(&sched, ex_logger);
+    sched_add_task(&sched, ex_udp, &udp, 100, 255);
+    sched_set_log_hook(&sched, NULL);
 
     sched_setup_signal_handlers();
     sched_start(&sched);
