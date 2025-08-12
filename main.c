@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include "src/scheduler.h"
+#include "src/system.h"
 
 void ex_logger(size_t index, void *data) {
     printf("[%d] Task %zu executed. Data: %p\n", millis(), index, data);

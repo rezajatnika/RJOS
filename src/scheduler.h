@@ -79,12 +79,6 @@ void sched_destroy(sched_t *sched);
 void sched_set_log_hook(sched_t *sched, sched_log_fn log_hook);
 
 /**
- * @brief Returns the current time in milliseconds since system start.
- * @return Current time in milliseconds.
- */
-uint32_t millis(void);
-
-/**
  * @brief Returns true if a shutdown signal has been received.
  */
 int sched_should_exit(void);
