@@ -22,6 +22,10 @@ typedef struct sched_task {
     uint32_t run_count;
     uint32_t total_duration_ms;
     uint32_t max_duration_ms;
+
+    /* Deadline tracking fields. */
+    uint32_t deadline_ms;
+    uint32_t overrun_count;
 } sched_task_t;
 
 /**
@@ -103,6 +107,10 @@ static inline uint32_t sched_avg_ms(sched_task_t *task) {
         return task->total_duration_ms / task->run_count;
     }
     return 0;
+}
+
+static inline uint32_t sched_get_overruns(sched_task_t *task) {
+    return task->overrun_count;
 }
 
 #endif

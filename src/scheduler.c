@@ -74,6 +74,8 @@ void sched_start(sched_t *sched) {
 
             uint32_t elapsed_ms = now_ms - task->last_run_ms;
             if (elapsed_ms >= task->interval_ms) {
+                task->deadline_ms = task->last_run_ms + task->interval_ms;
+
                 uint32_t start = current_time_ms();
                 task->callback(task->data);
                 uint32_t duration = current_time_ms() - start;
@@ -83,6 +85,13 @@ void sched_start(sched_t *sched) {
                 task->total_duration_ms += duration;
                 if (duration > task->max_duration_ms) {
                     task->max_duration_ms = duration;
+                }
+
+                /* Overrun detection. */
+                if (current_time_ms() > task->deadline_ms) {
+                    task->overrun_count++;
+                    fprintf(stderr, "[Overrun] Task %s exceeded deadline by %ums.\n",
+                        task->name, current_time_ms()-task->deadline_ms);
                 }
 
                 /* Call logging hook if set. */

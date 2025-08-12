@@ -12,7 +12,7 @@ void ex_logger(size_t index, void *data) {
 
 void ex_task(void *data) {
     for (int i = 0; i < 100; i++) {
-        usleep(10);
+        __asm__ __volatile__("nop");
     }
 }
 
