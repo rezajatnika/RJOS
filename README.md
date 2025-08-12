@@ -1,5 +1,3 @@
-![RJOS: Real-Time OS for Embedded Systems](https://gitlab.com/rezajatnika/rjos/-/raw/main/assets/rjos-logo.png?ref_type=heads&inline=false)
-
 # RJOS: RJ Operating System
 RJOS is a minimalist, purpose-built operating system designed for embedded and system-level
 applications that require deterministic behavior and continuous operation. It provides a
