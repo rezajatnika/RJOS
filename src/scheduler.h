@@ -11,6 +11,7 @@ typedef void (*sched_log_fn)(size_t idx, void *data);
  * @brief Represents a single scheduled task.
  */
 typedef struct {
+    const char *name;
     task_fn callback;       /**< Function to execute */
     void *data;             /**< Arguments of the function to execute */
     uint32_t interval_ms;   /**< Execution interval in milliseconds */

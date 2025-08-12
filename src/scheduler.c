@@ -54,6 +54,7 @@ int sched_add_task(sched_t *sched, task_fn fn, void *data, uint32_t interval_ms,
     sched_task_t *task = &sched->tasks[sched->tasks_count++];
     task->callback = fn;
     task->data = data;
+    task->name = "Task";
     task->interval_ms = interval_ms;
     task->last_run_ms = current_time_ms();
     task->priority = priority;
