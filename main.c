@@ -2,7 +2,7 @@
 #include "src/scheduler.h"
 
 void ex_logger(size_t index, void *data) {
-    printf("[RJOS] Task %zu executed. Data: %p\n", index, data);
+    printf("[%d] Task %zu executed. Data: %p\n", millis(), index, data);
 }
 
 void ex_task(void *data) {
@@ -14,7 +14,9 @@ void ex_task(void *data) {
 int main(void) {
     sched_t sched;
     sched_init(&sched, 4);
-    sched_add_task(&sched, ex_task, NULL, 1000);
+    sched_add_task(&sched, ex_task, "1234", 1000, 255);
+    sched_add_task(&sched, ex_task, "3456", 1000, 0);
+    sched_add_task(&sched, ex_task, "7890", 1000, 128);
     sched_set_log_hook(&sched, ex_logger);
 
     sched_setup_signal_handlers();

@@ -15,6 +15,7 @@ typedef struct {
     void *data;             /**< Arguments of the function to execute */
     uint32_t interval_ms;   /**< Execution interval in milliseconds */
     uint32_t last_run_ms;   /**< Timestamp of last execution */
+    uint8_t priority;       /**< 0 = Lowest, 255 = Highest */
 } sched_task_t;
 
 /**
@@ -49,7 +50,7 @@ int sched_init(sched_t *sched, size_t max_tasks);
  * @param interval_ms Interval in milliseconds between executions.
  * @return 0 on success, -1 if task list if full.
  */
-int sched_add_task(sched_t *sched, task_fn fn, void *data, uint32_t interval_ms);
+int sched_add_task(sched_t *sched, task_fn fn, void *data, uint32_t interval_ms, uint8_t priority);
 
 /**
  * @brief Starts the scheduler loop once.
@@ -74,7 +75,7 @@ void sched_destroy(sched_t *sched);
  * @param sched
  * @param log_hook
  */
-void sched_set_log_hook(sched_t *sched, sched_log_fn *log_hook);
+void sched_set_log_hook(sched_t *sched, sched_log_fn log_hook);
 
 /**
  * @brief Returns the current time in milliseconds since system start.

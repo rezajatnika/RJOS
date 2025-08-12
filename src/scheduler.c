@@ -22,6 +22,18 @@ static uint32_t current_time_ms() {
     return (uint32_t)(ts.tv_sec * 1000 + ts.tv_nsec / 1000000);
 }
 
+static void sort_tasks_by_priority(sched_t *sched) {
+    for (size_t i = 0; i < sched->tasks_count; ++i) {
+        sched_task_t key = sched->tasks[i];
+        size_t j = i;
+        while (j > 0 && sched->tasks[j-1].priority < key.priority) {
+            sched->tasks[j] = sched->tasks[j-1];
+            --j;
+        }
+        sched->tasks[j] = key;
+    }
+}
+
 int sched_init(sched_t *sched, size_t max_tasks) {
     sched->tasks = calloc(max_tasks, sizeof(sched_task_t));
     if (!sched->tasks) {
@@ -34,7 +46,7 @@ int sched_init(sched_t *sched, size_t max_tasks) {
     return 0;
 }
 
-int sched_add_task(sched_t *sched, task_fn fn, void *data, uint32_t interval_ms) {
+int sched_add_task(sched_t *sched, task_fn fn, void *data, uint32_t interval_ms, uint8_t priority) {
     if (!sched || !fn || sched->tasks_count >= sched->max_tasks) {
         perror("sched_add_task");
         return -1;
@@ -44,11 +56,14 @@ int sched_add_task(sched_t *sched, task_fn fn, void *data, uint32_t interval_ms)
     task->data = data;
     task->interval_ms = interval_ms;
     task->last_run_ms = current_time_ms();
+    task->priority = priority;
     return 0;
 }
 
 void sched_start(sched_t *sched) {
     sched->running = 1;
+    sort_tasks_by_priority(sched);
+
     while (!sched_should_exit()) {
         uint32_t now_ms = current_time_ms();
         uint32_t next_due_ms = UINT32_MAX;
@@ -93,7 +108,7 @@ void sched_destroy(sched_t *sched) {
     sched->tasks_count = 0;
 }
 
-void sched_set_log_hook(sched_t *sched, sched_log_fn *log_hook) {
+void sched_set_log_hook(sched_t *sched, sched_log_fn log_hook) {
     if (sched) {
         sched->log_hook = log_hook;
     }
