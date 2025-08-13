@@ -1,4 +1,5 @@
 #include "scheduler.h"
+#include "system.h"
 
 #include <signal.h>
 #include <stdio.h>
@@ -6,22 +7,59 @@
 #include <time.h>
 #include <unistd.h>
 
+/**
+ * @brief Indicates if a shutdown has been requested.
+ * @details This variable is set to 1 when a termination signal
+ * is received, signaling the application to begin the shutdown process.
+ * It remains 0 otherwise.
+ */
 static volatile sig_atomic_t shutdown_requested = 0;
 
+/**
+ * @brief Calculates the difference between two timestamps in milliseconds.
+ * @details Computes the signed difference between the end timestamp and the start timestamp.
+ * This is useful for measuring elapsed time, assuming the timestamps are provided in milliseconds.
+ *
+ * @param start The starting timestamp in milliseconds.
+ * @param end The ending timestamp in milliseconds.
+ * @return The time difference in milliseconds, with a signed integer to represent both positive and negative differences.
+ */
+static inline int32_t time_diff_ms(uint32_t start, uint32_t end) {
+    return (int32_t)(end - start);
+}
+
+/**
+ * @brief Checks if the current time has reached or exceeded a specified due time.
+ * @details Compares the current time with a specified due time to determine if the due time has been reached.
+ * A positive or zero difference indicates the due time is reached, while a negative difference indicates it has not.
+ *
+ * @param now Current time in milliseconds.
+ * @param due Scheduled due time in milliseconds.
+ * @return Returns 1 if the due time is reached or exceeded, otherwise returns 0.
+ */
+static inline int time_reached(uint32_t now, uint32_t due) {
+    return time_diff_ms(now, due) >= 0;
+}
+
+/**
+ * @brief Handles incoming signals and triggers shutdown.
+ * @details This function is invoked when a registered signal is received.
+ * It sets the shutdown_requested flag to indicate that the shutdown process
+ * should begin.
+ * @param sig The signal number received by the application.
+ */
 static void handle_signal(int sig) {
     shutdown_requested = 1;
 }
 
 /**
- * @brief Gets the current time in millisecond.
- * @return Current time in milliseconds.
+ * @brief Sorts tasks in the scheduler by priority in descending order.
+ * @details The function rearranges the tasks in the scheduler such that
+ * tasks with higher priority values appear earlier in the array.
+ * It uses an insertion sort algorithm.
+ *
+ * @param sched Pointer to the scheduler containing the tasks to be sorted.
  */
-static uint32_t current_time_ms() {
-    struct timespec ts;
-    clock_gettime(CLOCK_MONOTONIC, &ts);
-    return (uint32_t)(ts.tv_sec * 1000 + ts.tv_nsec / 1000000);
-}
-
 static void sort_tasks_by_priority(sched_t *sched) {
     for (size_t i = 0; i < sched->tasks_count; ++i) {
         sched_task_t key = sched->tasks[i];
@@ -56,7 +94,7 @@ int sched_add_task(sched_t *sched, task_fn fn, void *data, uint32_t interval_ms,
     task->data = data;
     task->name = name;
     task->interval_ms = interval_ms;
-    task->last_run_ms = current_time_ms();
+    task->last_run_ms = millis();
     task->priority = priority;
     return 0;
 }
@@ -66,7 +104,7 @@ void sched_start(sched_t *sched) {
     sort_tasks_by_priority(sched);
 
     while (!sched_should_exit()) {
-        uint32_t now_ms = current_time_ms();
+        uint32_t now_ms = millis();
         uint32_t next_due_ms = UINT32_MAX;
 
         for (size_t i = 0; i < sched->tasks_count; i++) {
@@ -76,9 +114,9 @@ void sched_start(sched_t *sched) {
             if (elapsed_ms >= task->interval_ms) {
                 task->deadline_ms = task->last_run_ms + task->interval_ms;
 
-                uint32_t start = current_time_ms();
+                uint32_t start = millis();
                 task->callback(task->data);
-                uint32_t duration = current_time_ms() - start;
+                uint32_t duration = millis() - start;
                 task->last_run_ms = now_ms;
 
                 task->run_count++;
@@ -88,10 +126,10 @@ void sched_start(sched_t *sched) {
                 }
 
                 /* Overrun detection. */
-                if (current_time_ms() > task->deadline_ms) {
+                if (millis() > task->deadline_ms) {
                     task->overrun_count++;
                     fprintf(stderr, "[Overrun] Task %s exceeded deadline by %ums.\n",
-                        task->name, current_time_ms()-task->deadline_ms);
+                        task->name, millis() - task->deadline_ms);
                 }
 
                 /* Call logging hook if set. */
@@ -105,7 +143,7 @@ void sched_start(sched_t *sched) {
                 }
             }
         }
-        /* Sleep until next task is due, or default to 1ms. */
+        /* Sleep until next task is due, or default to 1 ms. */
         uint32_t sleep_ms;
         if (next_due_ms == UINT32_MAX) {
             sleep_ms = 1;
@@ -133,15 +171,14 @@ void sched_set_log_hook(sched_t *sched, sched_log_fn log_hook) {
 }
 
 int sched_should_exit(void) {
-    return shutdown_requested;
+    return shutdown_requested != 0;
 }
 
 void sched_setup_signal_handlers(void) {
-    struct sigaction sa = {
-        .sa_handler = handle_signal,
-        .sa_flags = 0,
-    };
+    struct sigaction sa;
+    sa.sa_handler = handle_signal;
+    sa.sa_flags   = 0;
     sigemptyset(&sa.sa_mask);
-    sigaction(SIGINT, &sa, NULL);
-    sigaction(SIGTERM, &sa, NULL);
+    (void)sigaction(SIGINT,  &sa, NULL);
+    (void)sigaction(SIGTERM, &sa, NULL);
 }
