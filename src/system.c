@@ -10,7 +10,7 @@ static inline uint64_t ts_to_ns(const struct timespec *ts) {
     return (uint64_t)ts->tv_sec * UINT64_C(1000000000) + (uint64_t)ts->tv_nsec;
 }
 
-static inline get_monotonic_timespec(struct timespec *ts) {
+static inline int get_monotonic_timespec(struct timespec *ts) {
 #if defined(CLOCK_MONOTONIC_RAW)
     if (clock_gettime(CLOCK_MONOTONIC_RAW, ts) == 0) {
         return 0;
