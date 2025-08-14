@@ -5,7 +5,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <_string.h>
 
 /**
  * @brief Indicates if a shutdown has been requested.
