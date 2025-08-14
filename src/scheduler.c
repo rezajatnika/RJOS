@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <_string.h>
 
 /**
  * @brief Indicates if a shutdown has been requested.
@@ -33,7 +34,7 @@ static void handle_signal(int sig) {
  *
  * @param sched Pointer to the scheduler containing the tasks to be sorted.
  */
-static void sort_tasks_by_priority(sched_t *sched) {
+static void sort_tasks_by_priority(const sched_t *sched) {
     for (size_t i = 0; i < sched->tasks_count; ++i) {
         sched_task_t key = sched->tasks[i];
         size_t j = i;
@@ -57,7 +58,7 @@ int sched_init(sched_t *sched, size_t max_tasks) {
     return 0;
 }
 
-int sched_add_task(sched_t *sched, task_fn fn, void *data, uint32_t interval_ms, uint8_t priority, char *name) {
+int sched_add_task(sched_t *sched, task_fn fn, void *data, uint32_t interval_ms, uint8_t priority, const char *name) {
     if (!sched || !fn || sched->tasks_count >= sched->max_tasks) {
         perror("sched_add_task");
         return -1;
@@ -65,7 +66,7 @@ int sched_add_task(sched_t *sched, task_fn fn, void *data, uint32_t interval_ms,
     sched_task_t *task = &sched->tasks[sched->tasks_count++];
     task->callback = fn;
     task->data = data;
-    task->name = name;
+    task->name = strdup(name);
     task->interval_ms = interval_ms;
     task->last_run_ms = millis();
     task->priority = priority;
@@ -105,7 +106,7 @@ void sched_start(sched_t *sched) {
                         task->name, millis() - task->deadline_ms);
                 }
 
-                /* Call logging hook if set. */
+                /* Call the logging hook if set. */
                 if (sched->log_hook) {
                     sched->log_hook(i, task->data);
                 }
@@ -116,7 +117,7 @@ void sched_start(sched_t *sched) {
                 }
             }
         }
-        /* Sleep until next task is due, or default to 1 ms. */
+        /* Sleep until the next task is due, or default to 1 ms. */
         uint32_t sleep_ms;
         if (next_due_ms == UINT32_MAX) {
             sleep_ms = 1;

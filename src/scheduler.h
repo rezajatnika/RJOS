@@ -55,7 +55,7 @@ int sched_init(sched_t *sched, size_t max_tasks);
  * @param name Name of the task for identification purposes.
  * @return Returns 0 on success, or -1 on failure (e.g., if the scheduler is null, the function pointer is null, or the task limit is reached).
  */
-int sched_add_task(sched_t *sched, task_fn fn, void *data, uint32_t interval_ms, uint8_t priority, char *name);
+int sched_add_task(sched_t *sched, task_fn fn, void *data, uint32_t interval_ms, uint8_t priority, const char *name);
 
 /**
  * Starts the scheduler, managing tasks execution and priority.
