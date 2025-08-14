@@ -1,26 +1,39 @@
 cmake_minimum_required(VERSION 3.31)
 project(RJOS C)
 
+# Set the C Standard
+# https://www.open-std.org/jtc1/sc22/wg14/www/docs/n1548.pdf
 set(CMAKE_C_STANDARD 11)
 
-add_executable(RJOS main.c
-        src/scheduler.h
-        src/scheduler.c
-        src/serial.h
-        src/serial.c
-        src/system.h
+# Define the source files for the core library.
+set(CORE_SOURCES
         src/system.c
-        src/udp.h
-        src/udp.c)
+        src/scheduler.c
+        src/serial.c
+        src/udp.c
+)
 
-add_executable(RJOS_config main_config.c
-        src/config.c
-        src/config.h
+set(CORE_HEADERS
+        src/sys.h
         src/scheduler.h
-        src/scheduler.c
         src/serial.h
-        src/serial.c
-        src/system.h
-        src/system.c
         src/udp.h
-        src/udp.c)
+)
+
+# Define the source files for the configuration library.
+set(CONFIG_SOURCES
+        src/config.c
+)
+
+set(CONFIG_HEADERS
+        src/config.h
+)
+
+# Main executable for the configuration example.
+add_executable(RJOS_config
+        main_config.c
+        ${CONFIG_SOURCES}
+        ${CONFIG_HEADERS}
+        ${CORE_SOURCES}
+        ${CORE_HEADERS}
+)
