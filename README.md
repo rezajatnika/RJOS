@@ -9,6 +9,10 @@ reliability, and real-time responsiveness.
 Supports modular task definitions, configurable execution intervals, and efficient CPU usage for 
 real-time systems.
 - **UDP Driver**: Modular network interface for sending and receiving datagrams.
+- **Serial Port Driver**: Provides serial port communication capabilities, enabling data exchange
+with serial devices. Supports opening, configuring, reading, writing, and closing serial ports,
+facilitating communication with embedded peripherals and serial devices.
+
 
 
 ## Design Philosophy
