@@ -63,7 +63,7 @@ void config_init(config_t *config);
  *        The caller must ensure the configuration is properly initialized before calling.
  * @param filename Path to the configuration file to be loaded.
  *
- * @return 0 if the configuration is loaded successfully, or -1 if an error occurs (e.g., file
+ * @return 0 if the configuration is loaded successfully, or -1 if an error occurs (e.g., a file
  *         could not be opened or memory allocation fails).
  */
 int config_load(config_t *config, const char *filename);
