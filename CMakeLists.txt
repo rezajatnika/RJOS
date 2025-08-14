@@ -29,9 +29,26 @@ set(CONFIG_HEADERS
         src/config.h
 )
 
+# Compile RJOS library only.
+add_library(rjos STATIC
+        ${CONFIG_SOURCES}
+        ${CONFIG_HEADERS}
+        ${CORE_SOURCES}
+        ${CORE_HEADERS}
+)
+
 # Main executable for the configuration example.
-add_executable(RJOS_config
+add_executable(rjos_config
         main_config.c
+        ${CONFIG_SOURCES}
+        ${CONFIG_HEADERS}
+        ${CORE_SOURCES}
+        ${CORE_HEADERS}
+)
+
+# Main executable for the UDP example.
+add_executable(rjos_udp
+        main_udp.c
         ${CONFIG_SOURCES}
         ${CONFIG_HEADERS}
         ${CORE_SOURCES}
