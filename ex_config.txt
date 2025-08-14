@@ -1,0 +1,10 @@
+# This is a sample configuration file.
+
+# UDP driver
+host=127.0.0.1
+port=8080
+mode=debug
+
+# Serial Driver
+serial_device=/dev/ttys001
+baudrate=115200
