@@ -14,7 +14,7 @@ set(CORE_SOURCES
 )
 
 set(CORE_HEADERS
-        src/sys.h
+        src/system.h
         src/scheduler.h
         src/serial.h
         src/udp.h
