@@ -14,10 +14,10 @@
  * data length, and the payload.
  */
 typedef struct udp_packet {
-    char *src;
+    char    *src;
     uint16_t src_port;
-    size_t len;
-    uint8_t data[UDP_MAX_PAYLOAD];
+    size_t   len;
+    uint8_t  data[UDP_MAX_PAYLOAD];
 } udp_packet_t;
 
 /**
@@ -28,8 +28,8 @@ typedef struct udp_packet {
  * host address, and the port number.
  */
 typedef struct udp {
-    int sockfd;
-    char *host;
+    int      sockfd;
+    char    *host;
     uint16_t port;
 } udp_t;
 
