@@ -6,5 +6,5 @@ port=8080
 mode=debug
 
 # Serial Driver
-serial_device=/dev/ttys001
+serial_device=/dev/ttys002
 baudrate=115200

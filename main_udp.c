@@ -23,5 +23,6 @@ int main(void) {
     for (int i = 0; i < 10; ++i)
         udp_send(&udp, "Hello, world!\n", 14);
 
+    udp_close(&udp);
     return 0;
 }

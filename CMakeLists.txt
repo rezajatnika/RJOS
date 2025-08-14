@@ -54,3 +54,20 @@ add_executable(rjos_udp
         ${CORE_SOURCES}
         ${CORE_HEADERS}
 )
+
+# Main executable for the serial example.
+add_executable(rjos_serial
+        main_serial.c
+        ${CONFIG_SOURCES}
+        ${CONFIG_HEADERS}
+        ${CORE_SOURCES}
+        ${CORE_HEADERS}
+)
+
+add_executable(rjos_sched
+        main_sched.c
+        ${CONFIG_SOURCES}
+        ${CONFIG_HEADERS}
+        ${CORE_SOURCES}
+        ${CORE_HEADERS}
+)
