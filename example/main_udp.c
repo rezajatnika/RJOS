@@ -1,8 +1,8 @@
 #include <stdlib.h>
 
-#include "src/config.h"
-#include "src/system.h"
-#include "src/udp.h"
+#include "../src/config.h"
+#include "../src/system.h"
+#include "../src/udp.h"
 
 int main(void) {
     /* System initialization. */

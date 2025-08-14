@@ -1,6 +1,6 @@
 #include <stdio.h>
-#include "src/config.h"
-#include "src/system.h"
+#include "../src/config.h"
+#include "../src/system.h"
 
 int main(void) {
     system_init();

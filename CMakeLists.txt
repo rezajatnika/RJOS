@@ -39,7 +39,7 @@ add_library(rjos STATIC
 
 # Main executable for the configuration example.
 add_executable(rjos_config
-        main_config.c
+        example/main_config.c
         ${CONFIG_SOURCES}
         ${CONFIG_HEADERS}
         ${CORE_SOURCES}
@@ -48,7 +48,7 @@ add_executable(rjos_config
 
 # Main executable for the UDP example.
 add_executable(rjos_udp
-        main_udp.c
+        example/main_udp.c
         ${CONFIG_SOURCES}
         ${CONFIG_HEADERS}
         ${CORE_SOURCES}
@@ -57,7 +57,7 @@ add_executable(rjos_udp
 
 # Main executable for the serial example.
 add_executable(rjos_serial
-        main_serial.c
+        example/main_serial.c
         ${CONFIG_SOURCES}
         ${CONFIG_HEADERS}
         ${CORE_SOURCES}
@@ -65,7 +65,7 @@ add_executable(rjos_serial
 )
 
 add_executable(rjos_sched
-        main_sched.c
+        example/main_sched.c
         ${CONFIG_SOURCES}
         ${CONFIG_HEADERS}
         ${CORE_SOURCES}

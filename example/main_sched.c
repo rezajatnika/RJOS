@@ -1,8 +1,8 @@
 #include <stdio.h>
 
-#include "src/config.h"
-#include "src/scheduler.h"
-#include "src/system.h""
+#include "../src/config.h"
+#include "../src/scheduler.h"
+#include "../src/system.h"
 
 void task_1hz() {
     static int count = 0;

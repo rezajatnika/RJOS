@@ -34,11 +34,11 @@ $(LIBRARY): $(CORE_OBJS) $(CONFIG_OBJS)
 	$(AR) $(ARFLAGS) $@ $^
 
 # Rule to build the config example executable
-$(CONFIG_EXEC): main_config.c $(LIBRARY)
+$(CONFIG_EXEC): example/main_config.c $(LIBRARY)
 	$(CC) $(CFLAGS) main_config.c $(LIBRARY) -o $@
 
 # Rule to build the UDP example executable
-$(UDP_EXEC): main_udp.c $(LIBRARY)
+$(UDP_EXEC): example/main_udp.c $(LIBRARY)
 	$(CC) $(CFLAGS) main_udp.c $(LIBRARY) -o $@
 
 # Rule to compile core source files

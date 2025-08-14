@@ -3,9 +3,9 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "src/config.h"
-#include "src/system.h"
-#include "src/serial.h"
+#include "../src/config.h"
+#include "../src/system.h"
+#include "../src/serial.h"
 
 int main(void) {
     /* System initialization. */
