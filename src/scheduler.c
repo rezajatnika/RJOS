@@ -15,32 +15,6 @@
 static volatile sig_atomic_t shutdown_requested = 0;
 
 /**
- * @brief Calculates the difference between two timestamps in milliseconds.
- * @details Computes the signed difference between the end timestamp and the start timestamp.
- * This is useful for measuring elapsed time, assuming the timestamps are provided in milliseconds.
- *
- * @param start The starting timestamp in milliseconds.
- * @param end The ending timestamp in milliseconds.
- * @return The time difference in milliseconds, with a signed integer to represent both positive and negative differences.
- */
-static inline int32_t time_diff_ms(uint32_t start, uint32_t end) {
-    return (int32_t)(end - start);
-}
-
-/**
- * @brief Checks if the current time has reached or exceeded a specified due time.
- * @details Compares the current time with a specified due time to determine if the due time has been reached.
- * A positive or zero difference indicates the due time is reached, while a negative difference indicates it has not.
- *
- * @param now Current time in milliseconds.
- * @param due Scheduled due time in milliseconds.
- * @return Returns 1 if the due time is reached or exceeded, otherwise returns 0.
- */
-static inline int time_reached(uint32_t now, uint32_t due) {
-    return time_diff_ms(now, due) >= 0;
-}
-
-/**
  * @brief Handles incoming signals and triggers shutdown.
  * @details This function is invoked when a registered signal is received.
  * It sets the shutdown_requested flag to indicate that the shutdown process
