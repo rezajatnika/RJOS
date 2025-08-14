@@ -1,5 +1,5 @@
-#ifndef SCHEDULER_H
-#define SCHEDULER_H
+#ifndef RJOS_SCHEDULER_H
+#define RJOS_SCHEDULER_H
 
 #include <stdint.h>
 #include <stddef.h>
@@ -12,20 +12,16 @@ typedef void (*sched_log_fn)(size_t idx, void *data);
  */
 typedef struct sched_task {
     const char *name;
-    task_fn callback;       /**< Function to execute */
-    void *data;             /**< Arguments of the function to execute */
-    uint32_t interval_ms;   /**< Execution interval in milliseconds */
-    uint32_t last_run_ms;   /**< Timestamp of last execution */
-    uint8_t priority;       /**< 0 = Lowest, 255 = Highest */
-
-    /* Profiling fields. */
-    uint32_t run_count;
-    uint32_t total_duration_ms;
-    uint32_t max_duration_ms;
-
-    /* Deadline tracking fields. */
-    uint32_t deadline_ms;
-    uint32_t overrun_count;
+    task_fn     callback;      /**< Function to execute */
+    void       *data;          /**< Arguments of the function to execute */
+    uint32_t    interval_ms;   /**< Execution interval in milliseconds */
+    uint32_t    last_run_ms;   /**< Timestamp of last execution */
+    uint8_t     priority;      /**< 0 = Lowest, 255 = Highest */
+    uint32_t    run_count;
+    uint32_t    total_duration_ms;
+    uint32_t    max_duration_ms;
+    uint32_t    deadline_ms;
+    uint32_t    overrun_count;
 } sched_task_t;
 
 /**
@@ -33,10 +29,10 @@ typedef struct sched_task {
  */
 typedef struct shched {
     sched_task_t *tasks;
-    size_t max_tasks;
-    size_t tasks_count;
-    int running;
-    sched_log_fn log_hook;
+    size_t        max_tasks;
+    size_t        tasks_count;
+    int           running;
+    sched_log_fn  log_hook;
 } sched_t;
 
 /**
