@@ -35,8 +35,12 @@ int config_load(config_t *config, const char *filename) {
         if (newline) {
             *newline = '\0';
         }
-        config->entries = realloc(config->entries,
-            (config->num_entries + 1) * sizeof(config_entry_t));
+        config_entry_t *temp = realloc(config->entries, (config->num_entries + 1) * sizeof(config_entry_t));
+        if (!temp) {
+            perror("config_load: realloc");
+            return -1;
+        }
+        config->entries = temp;
 
         /* Add the key-value pair to the configuration. */
         strncpy(config->entries[config->num_entries].key, key, CONFIG_MAX_KEY_LEN);
