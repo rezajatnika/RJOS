@@ -83,7 +83,6 @@ void sched_stop(sched_t *sched);
  */
 void sched_destroy(sched_t *sched);
 
-
 /**
  * Sets a logging hook for the scheduler to allow tracking or debugging.
  *
@@ -91,7 +90,6 @@ void sched_destroy(sched_t *sched);
  * @param log_hook Function pointer to the log hook to be used for logging task-related events.
  */
 void sched_set_log_hook(sched_t *sched, sched_log_fn log_hook);
-
 
 /**
  * Checks if the scheduler should exit.

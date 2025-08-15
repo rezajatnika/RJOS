@@ -1,7 +1,6 @@
 #ifndef RJOS_SERIAL_H
 #define RJOS_SERIAL_H
 
-#include <stddef.h>
 #include <stdint.h>
 #include <sys/types.h>
 

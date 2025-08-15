@@ -48,7 +48,6 @@ typedef struct config {
  */
 void config_init(config_t *config);
 
-
 /**
  * @brief Loads configuration key-value pairs from a file into a config object.
  *

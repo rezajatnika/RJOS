@@ -80,7 +80,6 @@ int udp_close(udp_t *udp);
  * @param len  Buffer capacity in bytes.
  * @return Number of bytes received (>=0), or -1 on failure (errno set).
  */
-
 int udp_recv(udp_t *udp, char *data, size_t len);
 
 #endif
