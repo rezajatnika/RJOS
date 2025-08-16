@@ -124,7 +124,7 @@ void sched_start(sched_t *sched) {
         } else {
             sleep_ms = next_due_ms;
         }
-        usleep(sleep_ms * 100);
+        usleep(sleep_ms * 1000);
     }
 }
 
