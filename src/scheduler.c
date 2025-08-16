@@ -34,7 +34,7 @@ static void handle_signal(int sig) {
  *
  * @param sched Pointer to the scheduler containing the tasks to be sorted.
  */
-static void sort_tasks_by_priority(const sched_t *sched) {
+static void sort_tasks_by_priority(sched_t *sched) {
     for (size_t i = 0; i < sched->tasks_count; ++i) {
         sched_task_t key = sched->tasks[i];
         size_t j = i;
