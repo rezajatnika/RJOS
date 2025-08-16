@@ -235,7 +235,7 @@ int serial_set_blocking(serial_t *serial, int blocking) {
         perror("serial_set_blocking");
         return -1;
     }
-    if (set_nonblocking_flag(serial->fd, blocking) < 0) {
+    if (set_nonblocking_flag(serial->fd, !blocking) < 0) {
         return -1;
     }
     serial->blocking = blocking;
