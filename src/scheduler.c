@@ -27,23 +27,36 @@ static void handle_signal(int sig) {
 }
 
 /**
- * @brief Sorts tasks in the scheduler by priority in descending order.
- * @details The function rearranges the tasks in the scheduler such that
- * tasks with higher priority values appear earlier in the array.
- * It uses an insertion sort algorithm.
+ * @brief Comparison function for sorting scheduler tasks by priority.
+ * @details Compares two scheduler task objects by their priority values.
+ * The function returns:
+ * - A negative value if the priority of the first task is less than the second.
+ * - A positive value if the priority of the first task is greater than the second.
+ * - Zero if both tasks have the same priority.
  *
- * @param sched Pointer to the scheduler containing the tasks to be sorted.
+ * This function is designed to be utilized with sorting algorithms such as qsort.
+ *
+ * @param a Pointer to the first sched_task_t object.
+ * @param b Pointer to the second sched_task_t object.
+ * @return Integer representing the relative priority of the two tasks.
+ */
+static int sched_task_cmp(const void *a, const void *b) {
+    const sched_task_t *ta = (const sched_task_t *)a;
+    const sched_task_t *tb = (const sched_task_t *)b;
+    if (ta->priority < tb->priority) return -1;
+    if (ta->priority > tb->priority) return  1;
+    return 0;
+}
+
+/**
+ * @brief Sorts the tasks in the scheduler by priority.
+ * @details This function organizes the tasks in the scheduler structure in
+ * descending order of priority, ensuring that higher-priority tasks are scheduled first.
+ *
+ * @param sched Pointer to the scheduler structure that contains the task list to be sorted.
  */
 static void sort_tasks_by_priority(sched_t *sched) {
-    for (size_t i = 0; i < sched->tasks_count; ++i) {
-        sched_task_t key = sched->tasks[i];
-        size_t j = i;
-        while (j > 0 && sched->tasks[j-1].priority < key.priority) {
-            sched->tasks[j] = sched->tasks[j-1];
-            --j;
-        }
-        sched->tasks[j] = key;
-    }
+    qsort(sched->tasks, sched->tasks_count, sizeof(sched_task_t), sched_task_cmp);
 }
 
 int sched_init(sched_t *sched, size_t max_tasks) {
