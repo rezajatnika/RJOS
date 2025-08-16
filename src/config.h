@@ -2,6 +2,7 @@
 #define RJOS_CONFIG_H
 
 #include <stddef.h>
+#include <pthread.h>
 
 #define CONFIG_MAX_KEY_LEN 128
 #define CONFIG_MAX_VAL_LEN 256
@@ -32,6 +33,7 @@ typedef struct config_entry {
  */
 typedef struct config {
     config_entry_t *entries;
+    pthread_mutex_t mutex;
     size_t          num_entries;
 } config_t;
 

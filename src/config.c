@@ -7,6 +7,7 @@
 void config_init(config_t *config) {
     config->entries     = NULL;
     config->num_entries = 0;
+    pthread_mutex_init(&config->mutex, NULL);
 }
 
 int config_load(config_t *config, const char *filename) {
@@ -17,6 +18,7 @@ int config_load(config_t *config, const char *filename) {
     }
 
     char line[CONFIG_MAX_KEY_LEN + CONFIG_MAX_VAL_LEN + 2];
+    pthread_mutex_lock(&config->mutex);
     while (fgets(line, sizeof(line), fp)) {
         if (line[0] == '#' || line[0] == '\n') {
             continue;
@@ -57,6 +59,7 @@ int config_load(config_t *config, const char *filename) {
         config->entries[config->num_entries].val[CONFIG_MAX_VAL_LEN - 1] = '\0';
         config->num_entries++;
     }
+    pthread_mutex_unlock(&config->mutex);
     fclose(fp);
     return 0;
 }
@@ -72,6 +75,7 @@ const char *config_get(const config_t *config, const char *key) {
 
 void config_destroy(config_t *config) {
     free(config->entries);
+    pthread_mutex_destroy(&config->mutex);
     config->entries = NULL;
     config->num_entries = 0;
 }
