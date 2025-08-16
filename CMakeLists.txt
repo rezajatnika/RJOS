@@ -13,9 +13,23 @@ set(CORE_SOURCES
         src/udp.c
 )
 
+set(CORE_SOURCES_PT
+        src/system.c
+        src/scheduler_pt.c
+        src/serial.c
+        src/udp.c
+)
+
 set(CORE_HEADERS
         src/system.h
         src/scheduler.h
+        src/serial.h
+        src/udp.h
+)
+
+set(CORE_HEADERS_PT
+        src/system.h
+        src/scheduler_pt.h
         src/serial.h
         src/udp.h
 )
@@ -70,4 +84,12 @@ add_executable(rjos_sched
         ${CONFIG_HEADERS}
         ${CORE_SOURCES}
         ${CORE_HEADERS}
+)
+
+add_executable(rjos_sched_pt
+        example/main_sched_pt.c
+        ${CONFIG_SOURCES}
+        ${CONFIG_HEADERS}
+        ${CORE_SOURCES_PT}
+        ${CORE_HEADERS_PT}
 )
