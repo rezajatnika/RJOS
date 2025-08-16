@@ -156,9 +156,9 @@ static int apply_termios(int fd, serial_t *serial) {
             tio.c_cc[VMIN]  = 1;
             tio.c_cc[VTIME] = 0;
         } else {
-            int ds = serial->timeout_ms / 100;
-            if (ds <=   0) ds = 1;
-            if (ds <= 255) ds = 255;
+            int ds =serial->timeout_ms / 100;
+            if (ds <= 0)  ds = 1;
+            if (ds > 255) ds = 255;
             tio.c_cc[VMIN]  = 0;
             tio.c_cc[VTIME] = ds;
         }
