@@ -243,7 +243,7 @@ int serial_set_blocking(serial_t *serial, int blocking) {
 }
 
 ssize_t serial_write(serial_t *serial, const void *buf, size_t len) {
-    if (!serial || serial->fd < 0 || (!buf && len) > 0) {
+    if (!serial || serial->fd < 0 || !buf && len > 0) {
         perror("serial_write");
         return -1;
     }
@@ -267,14 +267,14 @@ ssize_t serial_write(serial_t *serial, const void *buf, size_t len) {
 }
 
 ssize_t serial_read(serial_t *serial, void *buf, size_t len) {
-    if (!serial || serial->fd < 0 || (!buf && len) > 0) {
+    if (!serial || serial->fd < 0 || !buf && len > 0) {
         perror("serial_read");
         return -1;
     }
     if (len == 0) return 0;
     for (;;) {
         ssize_t n = read(serial->fd, buf, len);
-        if (n >-0) {
+        if (n >= 0) {
             return n;
         }
         return -1;
