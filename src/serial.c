@@ -195,12 +195,6 @@ int serial_open(serial_t *serial, const char *device, uint32_t baudrate) {
     }
     set_cloexec(fd);
 
-    if (!serial->blocking) {
-        if (set_nonblocking_flag(fd, 1) < 0) {
-            close(fd);
-            return -1;
-        }
-    }
     char *dup = strdup(device);
     if (!dup) {
         return -1;
