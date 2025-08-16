@@ -27,7 +27,7 @@ typedef struct sched_task {
 /**
  * Struct representing a scheduler for managing and executing tasks.
  */
-typedef struct shched {
+typedef struct sched {
     sched_task_t *tasks;
     size_t        max_tasks;
     size_t        tasks_count;
