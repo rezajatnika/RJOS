@@ -7,6 +7,7 @@ set(CMAKE_C_STANDARD 11)
 
 # Define the source files for the core library.
 set(CORE_SOURCES
+        src/ipc.c
         src/system.c
         src/scheduler.c
         src/serial.c
@@ -14,6 +15,7 @@ set(CORE_SOURCES
 )
 
 set(CORE_SOURCES_PT
+        src/ipc.c
         src/system.c
         src/scheduler_pt.c
         src/serial.c
@@ -21,6 +23,7 @@ set(CORE_SOURCES_PT
 )
 
 set(CORE_HEADERS
+        src/ipc.h
         src/system.h
         src/scheduler.h
         src/serial.h
@@ -28,6 +31,7 @@ set(CORE_HEADERS
 )
 
 set(CORE_HEADERS_PT
+        src/ipc.h
         src/system.h
         src/scheduler_pt.h
         src/serial.h
@@ -92,4 +96,12 @@ add_executable(rjos_sched_pt
         ${CONFIG_HEADERS}
         ${CORE_SOURCES_PT}
         ${CORE_HEADERS_PT}
+)
+
+add_executable(rjos_ipc
+        example/main_ipc.c
+        ${CONFIG_SOURCES}
+        ${CONFIG_HEADERS}
+        ${CORE_SOURCES}
+        ${CORE_HEADERS}
 )
