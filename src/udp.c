@@ -83,13 +83,10 @@ int udp_init(udp_t *udp, const char *host, uint16_t port) {
         if (fd < 0) {
             continue;
         }
-        set_cloexec(fd);
-
-        if (connect(fd, rp->ai_addr, rp->ai_addrlen) == 0) {
-            break;
+        if (set_cloexec(fd) < 0 || connect(fd, rp->ai_addr, rp->ai_addrlen) < 0) {
+            close(fd);
+            fd = -1;
         }
-        close(fd);
-        fd = -1;
     }
     freeaddrinfo(res);
 
@@ -101,6 +98,7 @@ int udp_init(udp_t *udp, const char *host, uint16_t port) {
     udp->host = strdup(host);
     if (udp->host == NULL) {
         perror("udp_init: strdup");
+        close(fd);
         return -1;
     }
     udp->sockfd = fd;
