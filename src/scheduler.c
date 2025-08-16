@@ -117,14 +117,14 @@ void sched_start(sched_t *sched) {
                 }
             }
         }
-        /* Sleep until the next task is due, or default to 1 ms. */
-        uint32_t sleep_ms;
+        /* Sleep until the next task is due, or default to 100 us. */
+        uint32_t usleep_mul;
         if (next_due_ms == UINT32_MAX) {
-            sleep_ms = 1;
+            usleep_mul = 1;
         } else {
-            sleep_ms = next_due_ms;
+            usleep_mul = next_due_ms;
         }
-        usleep(sleep_ms * 1000);
+        usleep(usleep_mul * 100);
     }
 }
 
