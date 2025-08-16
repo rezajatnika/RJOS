@@ -2,6 +2,7 @@
 
 #include <fcntl.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <termios.h>
 #include <unistd.h>
 #include <string.h>
@@ -297,7 +298,9 @@ int serial_bytes_available(serial_t *serial, size_t *out_count) {
 
 int serial_close(serial_t *serial) {
     if (serial && serial->fd != -1) {
+        free(serial->device);
         close(serial->fd);
+
         serial->fd = -1;
         serial->device = NULL;
         serial->baudrate = 0;
