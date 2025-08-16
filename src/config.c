@@ -43,9 +43,18 @@ int config_load(config_t *config, const char *filename) {
         }
         config->entries = temp;
 
+        if (strlen(key) >= CONFIG_MAX_KEY_LEN) {
+            perror("config_load: key too long");
+        }
+        if (strlen(val) >= CONFIG_MAX_VAL_LEN) {
+            perror("config_load: value too long");
+        }
+
         /* Add the key-value pair to the configuration. */
-        strncpy(config->entries[config->num_entries].key, key, CONFIG_MAX_KEY_LEN);
-        strncpy(config->entries[config->num_entries].val, val, CONFIG_MAX_VAL_LEN);
+        strncpy(config->entries[config->num_entries].key, key, CONFIG_MAX_KEY_LEN - 1);
+        strncpy(config->entries[config->num_entries].val, val, CONFIG_MAX_VAL_LEN - 1);
+        config->entries[config->num_entries].key[CONFIG_MAX_KEY_LEN - 1] = '\0';
+        config->entries[config->num_entries].val[CONFIG_MAX_VAL_LEN - 1] = '\0';
         config->num_entries++;
     }
     fclose(fp);
