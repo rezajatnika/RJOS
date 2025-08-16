@@ -37,6 +37,7 @@ int config_load(config_t *config, const char *filename) {
         }
         config_entry_t *temp = realloc(config->entries, (config->num_entries + 1) * sizeof(config_entry_t));
         if (!temp) {
+            fclose(fp);
             perror("config_load: realloc");
             return -1;
         }
