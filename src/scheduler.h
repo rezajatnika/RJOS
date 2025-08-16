@@ -11,17 +11,17 @@ typedef void (*sched_log_fn)(size_t idx, void *data);
  * Struct representing a scheduled task in the system.
  */
 typedef struct sched_task {
-    const char *name;
-    task_fn     callback;      /**< Function to execute */
-    void       *data;          /**< Arguments of the function to execute */
-    uint32_t    interval_ms;   /**< Execution interval in milliseconds */
-    uint32_t    last_run_ms;   /**< Timestamp of last execution */
-    uint8_t     priority;      /**< 0 = Lowest, 255 = Highest */
-    uint32_t    run_count;
-    uint32_t    total_duration_ms;
-    uint32_t    max_duration_ms;
-    uint32_t    deadline_ms;
-    uint32_t    overrun_count;
+    char    *name;
+    task_fn  callback;      /**< Function to execute */
+    void    *data;          /**< Arguments of the function to execute */
+    uint32_t interval_ms;   /**< Execution interval in milliseconds */
+    uint32_t last_run_ms;   /**< Timestamp of last execution */
+    uint8_t  priority;      /**< 0 = Lowest, 255 = Highest */
+    uint32_t run_count;
+    uint32_t total_duration_ms;
+    uint32_t max_duration_ms;
+    uint32_t deadline_ms;
+    uint32_t overrun_count;
 } sched_task_t;
 
 /**

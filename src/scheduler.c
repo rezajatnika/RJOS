@@ -133,8 +133,12 @@ void sched_stop(sched_t *sched) {
 }
 
 void sched_destroy(sched_t *sched) {
+    for (size_t i = 0; i < sched->tasks_count; ++i) {
+        free(sched->tasks[i].name);
+    }
     free(sched->tasks);
     sched->tasks = NULL;
+    sched->max_tasks   = 0;
     sched->tasks_count = 0;
 }
 
