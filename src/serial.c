@@ -1,5 +1,6 @@
 #include "serial.h"
 #include "logger.h"
+#include "util/net_util.h"
 
 #include <fcntl.h>
 #include <stdio.h>
@@ -8,24 +9,6 @@
 #include <unistd.h>
 #include <string.h>
 #include <sys/ioctl.h>
-
-/**
- * Sets the FD_CLOEXEC flag on the specified file descriptor.
- *
- * This method configures the file descriptor to be automatically closed
- * when executing a new program using exec-family system calls.
- *
- * @param fd The file descriptor to modify.
- * @return 0 on success, -1 on failure, and sets errno appropriately.
- */
-static int set_cloexec(int fd) {
-    int flags = fcntl(fd, F_GETFD);
-    if (flags < 0) {
-        logger_log(LOG_LEVEL_ERROR, "set_cloexec: fcntl");
-        return -1;
-    }
-    return fcntl(fd, F_SETFD, flags | FD_CLOEXEC);
-}
 
 static int set_nonblocking_flag(int fd, int enable) {
     int flags = fcntl(fd, F_GETFL);

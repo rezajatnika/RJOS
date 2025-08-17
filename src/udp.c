@@ -1,54 +1,13 @@
 #include "udp.h"
 #include "logger.h"
+#include "util/net_util.h"
 
-#include <fcntl.h>
 #include <netdb.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 #include <arpa/inet.h>
 #include <sys/socket.h>
-
-/**
- * Sets the file descriptor to non-blocking mode.
- *
- * @param fd The file descriptor to be set to non-blocking mode.
- * @return Returns 0 on success, or -1 in case of failure.
- */
-static int set_nonblocking(int fd) {
-    int flags = fcntl(fd, F_GETFL, 0);
-    if (flags < 0) {
-        logger_log(LOG_LEVEL_ERROR, "set_nonblocking: fcntl failed");
-        return -1;
-    }
-    flags |= O_NONBLOCK;
-    if (fcntl(fd, F_SETFL, flags) < 0) {
-        logger_log(LOG_LEVEL_ERROR, "set_nonblocking: fcntl failed");
-    }
-    return 0;
-}
-
-/**
- * Sets the close-on-exec (FD_CLOEXEC) flag on a file descriptor.
- * This ensures that the file descriptor will be automatically closed
- * during an exec family function call.
- *
- * @param fd The file descriptor on which to set the close-on-exec flag.
- * @return Returns 0 on success, or -1 in case of failure.
- */
-static int set_cloexec(int fd) {
-    int flags = fcntl(fd, F_GETFD, 0);
-    if (flags < 0) {
-        logger_log(LOG_LEVEL_ERROR, "set_cloexec: fcntl failed");
-        return -1;
-    }
-    if (fcntl(fd, F_SETFD, flags | FD_CLOEXEC) < 0) {
-        logger_log(LOG_LEVEL_ERROR, "set_cloexec: fcntl failed");
-        return -1;
-    }
-    return 0;
-}
 
 int udp_init(udp_t *udp, const char *host, uint16_t port) {
     if (!udp || !host) {
