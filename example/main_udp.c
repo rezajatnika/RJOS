@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "../src/logger.h"
 #include "../src/config.h"
 #include "../src/scheduler.h"
 #include "../src/system.h"
@@ -17,6 +18,7 @@ void send_message(void *arg) {
 int main(void) {
     /* System initialization. */
     system_init();
+    logger_init("log.txt", LOG_LEVEL_DEBUG);
 
     /* Scheduler initialization. */
     sched_t sched;
@@ -35,11 +37,12 @@ int main(void) {
     udp_t udp;
     udp_init(&udp, host, atoi(port));
 
-    sched_add_task(&sched, send_message, &udp, 100, 0, "send_message");
+    sched_add_task(&sched, send_message, &udp, 10, 0, "send_message");
     sched_set_log_hook(&sched, NULL);
     sched_setup_signal_handlers();
     sched_start(&sched);
 
+    config_destroy(&config);
     udp_close(&udp);
     sched_destroy(&sched);
     return 0;

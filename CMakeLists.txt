@@ -35,8 +35,6 @@ set(RJOS_SRC
         ${CORE_HEADERS}
 )
 
-include_directories(src)
-
 add_library(rjos STATIC
         ${RJOS_SRC}
 )

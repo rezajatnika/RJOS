@@ -4,12 +4,14 @@
 #include <unistd.h>
 
 #include "../src/config.h"
+#include "../src/logger.h"
 #include "../src/system.h"
 #include "../src/serial.h"
 
 int main(void) {
     /* System initialization. */
     system_init();
+    logger_init("log.txt", LOG_LEVEL_DEBUG);
 
     /* Configuration initialization. */
     config_t config;
@@ -32,5 +34,6 @@ int main(void) {
         serial_write(&serial, buf, strlen(buf));
     }
     serial_close(&serial);
+    logger_destroy();
     return 0;
 }

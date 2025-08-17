@@ -1,4 +1,4 @@
-#include "logger.h"
+#include "../src/logger.h"
 
 int main(void) {
     if (logger_init("log.txt", LOG_LEVEL_DEBUG) != 0) {

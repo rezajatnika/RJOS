@@ -1,9 +1,13 @@
-#include <stdio.h>
 #include "../src/config.h"
 #include "../src/system.h"
+#include "../src/logger.h"
+
+#include <stdio.h>
+
 
 int main(void) {
     system_init();
+    logger_init("log.txt", LOG_LEVEL_DEBUG);
 
     config_t config;
     config_init(&config);
@@ -21,5 +25,6 @@ int main(void) {
     printf("[%d ms] UDP Mode: %s\n", millis(), mode ? mode : "not set");
 
     config_destroy(&config);
+    logger_destroy();
     return 0;
 }

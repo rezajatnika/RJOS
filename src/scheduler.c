@@ -163,7 +163,6 @@ void sched_set_log_hook(sched_t *sched, sched_log_fn log_hook) {
 }
 
 int sched_should_exit(void) {
-    logger_log(LOG_LEVEL_DEBUG, "sched_should_exit: %d", shutdown_requested);
     return shutdown_requested != 0;
 }
 

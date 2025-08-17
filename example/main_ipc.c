@@ -1,11 +1,17 @@
+#include "../src/ipc.h"
+#include "../src/system.h"
+#include "../src/logger.h"
+
 #include <stdio.h>
 #include <string.h>
 
-#include "../src/ipc.h"
 
 #define BUF_SIZE 256
 
 int main() {
+    system_init();
+    logger_init("log.txt", LOG_LEVEL_DEBUG);
+
     ipc_pipe_t pipe;
     const char *path = "/tmp/rjos_fifo";
 
@@ -27,5 +33,7 @@ int main() {
         fprintf(stderr, "Failed to close pipe.\n");
         return 1;
     }
+
+    logger_destroy();
     return 0;
 }
