@@ -15,7 +15,7 @@ int ipc_pipe_init(ipc_pipe_t *pipe, const char *path, int mode) {
     pipe->path[sizeof(pipe->path) - 1] = '\0';
     pipe->mode = mode;
 
-    /* Create the FIFO if it does not exists. */
+    /* Create the FIFO if it does not exist. */
     if (access(path, F_OK) < 0) {
         if (mkfifo(path, mode & 0777) < 0) {
             perror("ipc_pipe_init: mkfifo");

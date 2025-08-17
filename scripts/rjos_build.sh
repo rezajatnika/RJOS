@@ -4,7 +4,7 @@ set -e
 
 build_project() {
   BUILD_TYPE=$1
-  BUILD_DIR="bin/$BUILD_TYPE"
+  BUILD_DIR="bin"
   BUILD_TARGET=$2
 
   echo "Building RJOS example: $BUILD_TARGET with configuration $BUILD_TYPE"
@@ -34,3 +34,5 @@ if ! command -v ninja &>/dev/null; then
   echo "Error: ninja is not installed or not in PATH."
   exit 1
 fi
+
+build_project "$1" "$2"
