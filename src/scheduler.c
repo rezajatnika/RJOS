@@ -1,3 +1,4 @@
+#include "logger.h"
 #include "scheduler.h"
 #include "system.h"
 
@@ -62,7 +63,7 @@ static void sort_tasks_by_priority(sched_t *sched) {
 int sched_init(sched_t *sched, size_t max_tasks) {
     sched->tasks = calloc(max_tasks, sizeof(sched_task_t));
     if (!sched->tasks) {
-        perror("sched_init");
+        logger_log(LOG_LEVEL_ERROR, "Failed to allocate memory for scheduler tasks.");
         return -1;
     }
     sched->max_tasks = max_tasks;
@@ -73,7 +74,7 @@ int sched_init(sched_t *sched, size_t max_tasks) {
 
 int sched_add_task(sched_t *sched, task_fn fn, void *data, uint32_t interval_ms, uint8_t priority, const char *name) {
     if (!sched || !fn || sched->tasks_count >= sched->max_tasks) {
-        perror("sched_add_task");
+        logger_log(LOG_LEVEL_ERROR, "Failed to add task to scheduler: %s.", name);
         return -1;
     }
     sched_task_t *task = &sched->tasks[sched->tasks_count++];
@@ -83,6 +84,7 @@ int sched_add_task(sched_t *sched, task_fn fn, void *data, uint32_t interval_ms,
     task->interval_ms = interval_ms;
     task->last_run_ms = millis();
     task->priority = priority;
+    logger_log(LOG_LEVEL_DEBUG, "Added task to scheduler: %s.", task->name);
     return 0;
 }
 
@@ -115,8 +117,7 @@ void sched_start(sched_t *sched) {
                 /* Overrun detection. */
                 if (millis() > task->deadline_ms) {
                     task->overrun_count++;
-                    fprintf(stderr, "[Overrun] Task %s exceeded deadline by %ums.\n",
-                        task->name, millis() - task->deadline_ms);
+                    logger_log(LOG_LEVEL_INFO, "Task %s exceeded deadline by %ums.", millis() - task->deadline_ms);
                 }
 
                 /* Call the logging hook if set. */
@@ -162,6 +163,7 @@ void sched_set_log_hook(sched_t *sched, sched_log_fn log_hook) {
 }
 
 int sched_should_exit(void) {
+    logger_log(LOG_LEVEL_DEBUG, "sched_should_exit: %d", shutdown_requested);
     return shutdown_requested != 0;
 }
 

@@ -1,12 +1,12 @@
 #include <signal.h>
 #include <pthread.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 
 #include "scheduler_pt.h"
 #include "system.h"
+#include "logger.h"
 
 /**
  * @brief Indicates if a shutdown has been requested.
@@ -84,8 +84,7 @@ static void *sched_task_thread(void *arg) {
     }
     if (millis() > task->deadline_ms) {
         task->overrun_count++;
-        fprintf(stderr, "[Overrun] Task %s exceeded deadline by %ums.\n",
-            task->name, millis() - task->deadline_ms);
+        logger_log(LOG_LEVEL_INFO, "Task %s exceeded deadline by %ums.", millis() - task->deadline_ms);
     }
     sched_t *sched = ctx->sched;
     size_t idx = ctx->idx;
@@ -101,7 +100,6 @@ static void *sched_task_thread(void *arg) {
 int sched_init(sched_t *sched, size_t max_tasks) {
     sched->tasks = calloc(max_tasks, sizeof(sched_task_t));
     if (!sched->tasks) {
-        perror("sched_init");
         return -1;
     }
     sched->max_tasks = max_tasks;
@@ -113,7 +111,6 @@ int sched_init(sched_t *sched, size_t max_tasks) {
 
 int sched_add_task(sched_t *sched, task_fn fn, void *data, uint32_t interval_ms, uint8_t priority, const char *name) {
     if (!sched || !fn || sched->tasks_count >= sched->max_tasks) {
-        perror("sched_add_task");
         return -1;
     }
     sched_task_t *task = &sched->tasks[sched->tasks_count++];
@@ -136,7 +133,6 @@ void sched_start(sched_t *sched) {
 
     pthread_t *worker_threads = calloc(sched->tasks_count, sizeof(pthread_t));
     if (!worker_threads) {
-        perror("sched_start calloc worker threads");
         return;
     }
 
@@ -161,7 +157,6 @@ void sched_start(sched_t *sched) {
 
                 /* Start the thread. */
                 if (pthread_create(&worker_threads[thread_count++], NULL, sched_task_thread, ctx) != 0) {
-                    perror("pthread_create");
                     free(ctx);
                     continue;
                 }

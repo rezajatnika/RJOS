@@ -1,4 +1,5 @@
 #include "udp.h"
+#include "logger.h"
 
 #include <fcntl.h>
 #include <netdb.h>
@@ -18,12 +19,12 @@
 static int set_nonblocking(int fd) {
     int flags = fcntl(fd, F_GETFL, 0);
     if (flags < 0) {
-        perror("set_nonblocking: fcntl");
+        logger_log(LOG_LEVEL_ERROR, "set_nonblocking: fcntl failed");
         return -1;
     }
     flags |= O_NONBLOCK;
     if (fcntl(fd, F_SETFL, flags) < 0) {
-        perror("set_nonblocking: fcntl");
+        logger_log(LOG_LEVEL_ERROR, "set_nonblocking: fcntl failed");
     }
     return 0;
 }
@@ -39,11 +40,11 @@ static int set_nonblocking(int fd) {
 static int set_cloexec(int fd) {
     int flags = fcntl(fd, F_GETFD, 0);
     if (flags < 0) {
-        perror("set_cloexec: fcntl");
+        logger_log(LOG_LEVEL_ERROR, "set_cloexec: fcntl failed");
         return -1;
     }
     if (fcntl(fd, F_SETFD, flags | FD_CLOEXEC) < 0) {
-        perror("set_cloexec: fcntl");
+        logger_log(LOG_LEVEL_ERROR, "set_cloexec: fcntl failed");
         return -1;
     }
     return 0;
@@ -51,7 +52,7 @@ static int set_cloexec(int fd) {
 
 int udp_init(udp_t *udp, const char *host, uint16_t port) {
     if (!udp || !host) {
-        perror("udp_init");
+        logger_log(LOG_LEVEL_ERROR, "udp_init: invalid arguments");
         return -1;
     }
     udp->sockfd = -1;
@@ -61,7 +62,7 @@ int udp_init(udp_t *udp, const char *host, uint16_t port) {
     char service[16];
     int n = snprintf(service, sizeof(service), "%u", (unsigned)port);
     if (n < 0 || (size_t)n >= sizeof(service)) {
-        perror("udp_init: snprintf");
+        logger_log(LOG_LEVEL_ERROR, "udp_init: snprintf failed");
         return -1;
     }
 
@@ -73,7 +74,7 @@ int udp_init(udp_t *udp, const char *host, uint16_t port) {
     struct addrinfo *res = NULL;
     int rc = getaddrinfo(host, service, &hints, &res);
     if (rc != 0) {
-        perror("udp_init: getaddrinfo");
+        logger_log(LOG_LEVEL_ERROR, "udp_init: getaddrinfo failed");
         return -1;
     }
 
@@ -91,13 +92,13 @@ int udp_init(udp_t *udp, const char *host, uint16_t port) {
     freeaddrinfo(res);
 
     if (fd < 0) {
-        perror("udp_init: socket");
+        logger_log(LOG_LEVEL_ERROR, "udp_init: failed to connect");
         return -1;
     }
 
     udp->host = strdup(host);
     if (udp->host == NULL) {
-        perror("udp_init: strdup");
+        logger_log(LOG_LEVEL_ERROR, "udp_init: strdup failed");
         close(fd);
         return -1;
     }
@@ -108,7 +109,7 @@ int udp_init(udp_t *udp, const char *host, uint16_t port) {
 
 int udp_send(udp_t *udp, char *data, size_t len) {
     if (!udp || udp->sockfd < 0 || (!data && len > 0)) {
-        perror("udp_send");
+        logger_log(LOG_LEVEL_ERROR, "udp_send: invalid arguments");
         return -1;
     }
     if (len == 0) {
@@ -127,7 +128,7 @@ int udp_send(udp_t *udp, char *data, size_t len) {
 
 int udp_recv(udp_t *udp, char *data, size_t len) {
     if (!udp || udp->sockfd < 0 || (!data && len > 0)) {
-        perror("udp_recv");
+        logger_log(LOG_LEVEL_ERROR, "udp_recv: invalid arguments");
         return -1;
     }
     if (len == 0) {
@@ -146,7 +147,7 @@ int udp_recv(udp_t *udp, char *data, size_t len) {
 
 int udp_close(udp_t *udp) {
     if (!udp) {
-        perror("udp_close");
+        logger_log(LOG_LEVEL_ERROR, "udp_close: invalid arguments");
         return -1;
     }
 

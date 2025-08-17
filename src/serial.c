@@ -1,4 +1,5 @@
 #include "serial.h"
+#include "logger.h"
 
 #include <fcntl.h>
 #include <stdio.h>
@@ -20,7 +21,7 @@
 static int set_cloexec(int fd) {
     int flags = fcntl(fd, F_GETFD);
     if (flags < 0) {
-        perror("set_cloexec: fcntl");
+        logger_log(LOG_LEVEL_ERROR, "set_cloexec: fcntl");
         return -1;
     }
     return fcntl(fd, F_SETFD, flags | FD_CLOEXEC);
@@ -29,7 +30,7 @@ static int set_cloexec(int fd) {
 static int set_nonblocking_flag(int fd, int enable) {
     int flags = fcntl(fd, F_GETFL);
     if (flags < 0) {
-        perror("set_nonblocking_flag: fcntl");
+        logger_log(LOG_LEVEL_ERROR, "set_nonblocking_flag: fcntl");
         return -1;
     }
     if (enable) {
@@ -83,7 +84,7 @@ static speed_t map_baud(uint32_t baud) {
 static int apply_termios(int fd, serial_t *serial) {
     struct termios tio;
     if (tcgetattr(fd, &tio) < 0) {
-        perror("apply_termios: tcgetattr");
+        logger_log(LOG_LEVEL_ERROR, "apply_termios: tcgetattr");
         return -1;
     }
 
@@ -93,7 +94,7 @@ static int apply_termios(int fd, serial_t *serial) {
     /* Baud rate configuration. */
     speed_t speed = map_baud(serial->baudrate);
     if (speed == 0) {
-        perror("apply_termios: map_baud");
+        logger_log(LOG_LEVEL_ERROR, "apply_termios: map_baud");
         return -1;
     }
     if (cfsetispeed(&tio, speed) < 0) return -1;
@@ -167,7 +168,7 @@ static int apply_termios(int fd, serial_t *serial) {
         tio.c_cc[VTIME] = 0;
     }
     if (tcsetattr(fd, TCSANOW, &tio) < 0) {
-        perror("apply_termios: tcsetattr");
+        logger_log(LOG_LEVEL_ERROR, "apply_termios: tcsetattr");
         return -1;
     }
     tcflush(fd, TCIFLUSH);
@@ -213,7 +214,7 @@ int serial_open(serial_t *serial, const char *device, uint32_t baudrate) {
 
 int serial_set_timeout(serial_t *serial, uint32_t timeout_ms) {
     if (!serial || serial->fd < 0) {
-        perror("serial_set_timeout");
+        logger_log(LOG_LEVEL_ERROR, "serial_set_timeout");
         return -1;
     }
     if (!serial->blocking) {
@@ -226,7 +227,7 @@ int serial_set_timeout(serial_t *serial, uint32_t timeout_ms) {
 
 int serial_set_blocking(serial_t *serial, int blocking) {
     if (!serial || serial->fd < 0) {
-        perror("serial_set_blocking");
+        logger_log(LOG_LEVEL_ERROR, "serial_set_blocking");
         return -1;
     }
     if (set_nonblocking_flag(serial->fd, !blocking) < 0) {
@@ -238,7 +239,7 @@ int serial_set_blocking(serial_t *serial, int blocking) {
 
 ssize_t serial_write(serial_t *serial, const void *buf, size_t len) {
     if (!serial || serial->fd < 0 || !buf && len > 0) {
-        perror("serial_write");
+        logger_log(LOG_LEVEL_ERROR, "serial_write");
         return -1;
     }
     if (len == 0) {
@@ -262,7 +263,7 @@ ssize_t serial_write(serial_t *serial, const void *buf, size_t len) {
 
 ssize_t serial_read(serial_t *serial, void *buf, size_t len) {
     if (!serial || serial->fd < 0 || !buf && len > 0) {
-        perror("serial_read");
+        logger_log(LOG_LEVEL_ERROR, "serial_read");
         return -1;
     }
     if (len == 0) return 0;
@@ -277,12 +278,12 @@ ssize_t serial_read(serial_t *serial, void *buf, size_t len) {
 
 int serial_bytes_available(serial_t *serial, size_t *out_count) {
     if (!serial || serial->fd < 0) {
-        perror("serial_bytes_available");
+        logger_log(LOG_LEVEL_ERROR, "serial_bytes_available");
         return -1;
     }
     int n = 0;
     if (ioctl(serial->fd, FIONREAD, &n) < 0) {
-        perror("serial_bytes_available: ioctl");
+        logger_log(LOG_LEVEL_ERROR, "serial_bytes_available: ioctl");
         return -1;
     }
     if (n < 0) n = 0;
