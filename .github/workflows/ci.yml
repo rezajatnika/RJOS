@@ -23,7 +23,7 @@ jobs:
     steps:
       # Step 1: Check Out Repository
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       # Step 2: Install Dependencies
       - name: Install dependencies (Linux/macOS)
@@ -58,9 +58,9 @@ jobs:
           ctest --output-on-failure
         if: success()
 
-      # Step 7: Upload Build Artifacts (Optional)
+      # Step 7: Upload Library Artifacts
       - name: Upload Library Artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: rjos-library
           path: build/
