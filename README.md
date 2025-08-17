@@ -1,3 +1,4 @@
+![Build Status](https://github.com/rezajatnika/RJOS/actions/workflows/ci.yml/badge.svg)
 # RJOS: RJ Operating System
 
 RJOS is a minimalist, purpose-built operating system designed for embedded and system-level applications that require deterministic behavior and continuous operation. It provides a lightweight foundation for infinite-loop system applications, with a focus on modularity, reliability, and real-time responsiveness.
