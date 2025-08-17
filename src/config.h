@@ -80,7 +80,7 @@ int config_load(config_t *config, const char *filename);
  * @param key The key whose value is to be retrieved.
  * @return The value associated with the key if found, NULL otherwise.
  */
-const char *config_get(const config_t *config, const char *key);
+const char *config_get(config_t *config, const char *key);
 
 /**
  * @brief Frees the resources associated with a configuration object.
