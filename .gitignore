@@ -1,3 +1,39 @@
-/.idea
-/.bin/
+# Ignore macOS system files
+.DS_Store
+
+# Ignore build directories and build artifacts
 /tmp/
+bin/
+*.o
+*.so
+*.a
+*.exe
+*.out
+
+# Ignore editor and IDE specific files
+.idea/
+*.iml
+*.swp
+*.log
+*.stackdump
+.vscode/
+*.bak
+
+# Ignore CMake build directories
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+build/
+
+# Ignore Makefile artifacts
+*.d
+.dep
+
+# Ignore temporary or backup files
+*~
+*.tmp
+*.old
+
+# Ignore test and example artifacts (if generated during build)
+example/
+tests/
