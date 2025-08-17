@@ -54,5 +54,5 @@ jobs:
       - name: Upload Library Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: rjos-library
+          name: rjos-library-${{ matrix.compiler }}
           path: build/
