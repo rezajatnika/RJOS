@@ -1,12 +1,12 @@
 ![Build Status](https://github.com/rezajatnika/RJOS/actions/workflows/ci.yml/badge.svg)
-# RJOS: RJ Operating System
-
-RJOS is a minimalist, purpose-built operating system designed for embedded and system-level applications that require deterministic behavior and continuous operation. It provides a lightweight foundation for infinite-loop system applications, with a focus on modularity, reliability, and real-time responsiveness.
+# RJOS
+The **RJOS** is a lightweight C framework designed for building real-time and embedded applications.
+It provides modular components for scheduling, inter-process communication, logging, and I/O management,
+enabling developers to efficiently manage complex systems without being tied to a specific operating system.
 
 ## Features
-
 ### 1. Task Scheduler
-- High-precision interval-based scheduling for managing recurring tasks.
+- High precision interval-based scheduling for managing recurring tasks.
 - Supports modular task definitions with configurable execution intervals.
 - Includes **Preemptive Multitasking** via the `scheduler_pt` module.
 - Optimized for efficient CPU usage in real-time systems.
@@ -51,19 +51,6 @@ To compile all builds and configurations:
    ./rjos_build.sh
    ```
 3. The compiled binaries will be in `bin/<BUILD_TYPE>` for each configuration.
-
-### Example Build Configurations
-The build script supports the following configurations:
-- `Debug`: Build with debug symbols.
-- `Release`: Optimized build for deployment.
-- `RelWithDebInfo`: Release build with additional debug information.
-- `MinSizeRel`: Optimized for minimum size.
-
-## Design Philosophy
-- **Bare-metal simplicity**: No unnecessary abstractions—just the essentials for predictable, continuous operation.
-- **Modularity**: Flexible and extensible for specific use cases.
-- **Efficiency**: Optimized components for embedded and resource-constrained environments.
-- **Real-time responsiveness**: Designed to prioritize time-critical operations.
 
 ## Examples
 Example applications for various components are located in the `example` directory:
