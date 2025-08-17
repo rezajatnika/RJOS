@@ -12,6 +12,7 @@ set(CORE_SOURCES
         src/scheduler.c
         src/serial.c
         src/udp.c
+        src/logger.c
 )
 
 set(CORE_SOURCES_PT
@@ -20,6 +21,7 @@ set(CORE_SOURCES_PT
         src/scheduler_pt.c
         src/serial.c
         src/udp.c
+        src/logger.c
 )
 
 set(CORE_HEADERS
@@ -28,6 +30,7 @@ set(CORE_HEADERS
         src/scheduler.h
         src/serial.h
         src/udp.h
+        src/logger.h
 )
 
 set(CORE_HEADERS_PT
@@ -36,6 +39,7 @@ set(CORE_HEADERS_PT
         src/scheduler_pt.h
         src/serial.h
         src/udp.h
+        src/logger.h
 )
 
 # Define the source files for the configuration library.
@@ -108,4 +112,10 @@ add_executable(rjos_ipc
         ${CONFIG_HEADERS}
         ${CORE_SOURCES}
         ${CORE_HEADERS}
+)
+
+add_executable(rjos_logger
+        example/main_logger.c
+        src/logger.c
+        src/logger.h
 )
