@@ -1,0 +1,66 @@
+name: Build and Test RJOS Library
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+    branches:
+      - main
+      - master
+
+jobs:
+  build-and-test:
+    name: Build and Test RJOS Library on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        compiler: [gcc, clang]
+      fail-fast: false
+
+    steps:
+      # Step 1: Check Out Repository
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Step 2: Install Dependencies
+      - name: Install dependencies (Linux/macOS)
+        if: ${{ startsWith(matrix.os, 'ubuntu') || startsWith(matrix.os, 'macos') }}
+        run: |
+          sudo apt-get update || brew update
+          sudo apt-get install build-essential cmake gcc make -y || brew install cmake gcc
+
+      - name: Install dependencies (Windows)
+        if: ${{ startsWith(matrix.os, 'windows') }}
+        run: |
+          choco install cmake --installargs '"ADD_CMAKE_TO_PATH=System"' --yes
+          choco install mingw --yes
+
+      # Step 3: Create a Build Directory
+      - name: Create build directory
+        run: mkdir build
+
+      # Step 4: Configure the Build
+      - name: Configure
+        run: |
+          cmake -S . -B build -DCMAKE_C_COMPILER=${{ matrix.compiler }}
+
+      # Step 5: Build the Library
+      - name: Build
+        run: cmake --build build --target rjos
+
+      # Step 6: Run Tests (Optional if you have tests configured)
+      - name: Run tests
+        run: |
+          cd build
+          ctest --output-on-failure
+        if: success()
+
+      # Step 7: Upload Build Artifacts (Optional)
+      - name: Upload Library Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: rjos-library
+          path: build/

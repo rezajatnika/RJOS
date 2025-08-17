@@ -48,11 +48,15 @@ set(CONFIG_HEADERS
 )
 
 # Compile RJOS library only.
+include_directories(src)
+
 add_library(rjos STATIC
         ${CONFIG_SOURCES}
         ${CONFIG_HEADERS}
         ${CORE_SOURCES}
         ${CORE_HEADERS}
+        ${CORE_SOURCES_PT}
+        ${CORE_HEADERS_PT}
 )
 
 # Main executable for the configuration example.
