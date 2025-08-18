@@ -84,7 +84,7 @@ static void *sched_task_thread(void *arg) {
     }
     if (millis() > task->deadline_ms) {
         task->overrun_count++;
-        logger_log(LOG_LEVEL_INFO, "Task %s exceeded deadline by %ums.", millis() - task->deadline_ms);
+        logger_log(LOG_LEVEL_INFO, "Task %s exceeded deadline by %ums.", task->name, millis() - task->deadline_ms);
     }
     sched_t *sched = ctx->sched;
     size_t idx = ctx->idx;

@@ -117,7 +117,7 @@ void sched_start(sched_t *sched) {
                 /* Overrun detection. */
                 if (millis() > task->deadline_ms) {
                     task->overrun_count++;
-                    logger_log(LOG_LEVEL_INFO, "Task %s exceeded deadline by %ums.", millis() - task->deadline_ms);
+                    logger_log(LOG_LEVEL_INFO, "Task %s exceeded deadline by %ums.", task->name, millis() - task->deadline_ms);
                 }
 
                 /* Call the logging hook if set. */

@@ -5,6 +5,10 @@ project(RJOS C)
 # https://www.open-std.org/jtc1/sc22/wg14/www/docs/n1548.pdf
 set(CMAKE_C_STANDARD 11)
 
+# Enable AddressSanitizer
+# set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fsanitize=address")
+# set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fsanitize=address")
+
 # Define the source files for the core library.
 set(CORE_SOURCES
         src/util/net_util.c
