@@ -11,27 +11,29 @@ set(CMAKE_C_STANDARD 11)
 
 # Define the source files for the core library.
 set(CORE_SOURCES
-        src/util/net_util.c
-        src/util/sched_util.c
         src/config.c
         src/ipc.c
-        src/system.c
-        src/serial.c
-        src/udp.c
         src/logger.c
+        src/rjos.c
         src/scheduler.c
+        src/serial.c
+        src/system.c
+        src/udp.c
+        src/util/net_util.c
+        src/util/sched_util.c
 )
 
 set(CORE_HEADERS
-        src/util/net_util.h
-        src/util/sched_util.h
         src/config.h
         src/ipc.h
-        src/system.h
-        src/serial.h
-        src/udp.h
         src/logger.h
+        src/rjos.h
         src/scheduler.h
+        src/serial.h
+        src/system.h
+        src/udp.h
+        src/util/net_util.h
+        src/util/sched_util.h
 )
 
 set(RJOS_SRC
@@ -45,15 +47,12 @@ add_library(rjos STATIC
 
 include_directories("src")
 
-# Main executable for the configuration example.
 add_executable(rjos_config example/main_config.c)
 target_link_libraries(rjos_config PRIVATE rjos)
 
-# Main executable for the UDP example.
 add_executable(rjos_udp example/main_udp.c)
 target_link_libraries(rjos_udp PRIVATE rjos)
 
-# Main executable for the serial example.
 add_executable(rjos_serial example/main_serial.c)
 target_link_libraries(rjos_serial PRIVATE rjos)
 
@@ -65,30 +64,3 @@ target_link_libraries(rjos_ipc PRIVATE rjos)
 
 add_executable(rjos_logger example/main_logger.c)
 target_link_libraries(rjos_logger PRIVATE rjos)
-
-set(CORE_PT_SOURCES
-        src/util/net_util.c
-        src/config.c
-        src/ipc.c
-        src/system.c
-        src/serial.c
-        src/udp.c
-        src/logger.c
-        src/scheduler_pt.c
-)
-
-set(CORE_PT_HEADERS
-        src/util/net_util.h
-        src/config.h
-        src/ipc.h
-        src/system.h
-        src/serial.h
-        src/udp.h
-        src/logger.h
-        src/scheduler_pt.h
-)
-add_executable(rjos_sched_pt
-        example/main_sched_pt.c
-        ${CORE_PT_SOURCES}
-        ${CORE_PT_HEADERS}
-)

@@ -1,15 +1,11 @@
-#include "../src/logger.h"
+#include "rjos.h"
 
 int main(void) {
-    if (logger_init("log.txt", LOG_LEVEL_DEBUG) != 0) {
-        printf("logger_init failed\n");
-        return -1;
-    }
+    rjos_init("config.txt", "log.txt");
 
-    logger_log(LOG_LEVEL_DEBUG, "This is a DEBUG message.");
-    logger_log(LOG_LEVEL_INFO,  "This is an INFO message.");
-    logger_log(LOG_LEVEL_WARN,  "This is a WARN message.");
+    /* Example logging a message. */
+    logger_log(LOG_LEVEL_DEBUG, "This is a debug message.");
 
-    logger_destroy();
+    rjos_cleanup();
     return 0;
 }
