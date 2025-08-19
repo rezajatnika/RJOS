@@ -12,6 +12,7 @@ set(CMAKE_C_STANDARD 11)
 # Define the source files for the core library.
 set(CORE_SOURCES
         src/util/net_util.c
+        src/util/sched_util.c
         src/config.c
         src/ipc.c
         src/system.c
@@ -23,6 +24,7 @@ set(CORE_SOURCES
 
 set(CORE_HEADERS
         src/util/net_util.h
+        src/util/sched_util.h
         src/config.h
         src/ipc.h
         src/system.h
@@ -40,6 +42,8 @@ set(RJOS_SRC
 add_library(rjos STATIC
         ${RJOS_SRC}
 )
+
+include_directories("src")
 
 # Main executable for the configuration example.
 add_executable(rjos_config example/main_config.c)

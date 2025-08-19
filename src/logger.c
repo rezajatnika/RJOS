@@ -61,7 +61,7 @@ void logger_log(int level, const char *format, ...) {
         strncpy(time_str, "UNKNOWN TIME", sizeof(time_str));
     }
 
-    /* Write log message. */
+    /* Write a log message. */
     if (glog.file) {
         fprintf(glog.file, "[%s] ", time_str);
         switch (level) {

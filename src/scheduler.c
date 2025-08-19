@@ -1,6 +1,7 @@
 #include "logger.h"
 #include "scheduler.h"
 #include "system.h"
+#include "util/sched_util.h"
 
 #include <signal.h>
 #include <stdio.h>
@@ -27,37 +28,6 @@ static volatile sig_atomic_t shutdown_requested = 0;
  */
 static void handle_signal(int sig) {
     shutdown_requested = 1;
-}
-
-/**
- * @brief Comparison function for sorting scheduler tasks by priority.
- * @details Compares two scheduler task objects by their priority values.
- * The function returns:
- * - A negative value if the priority of the first task is less than the second.
- * - A positive value if the priority of the first task is greater than the second.
- * - Zero if both tasks have the same priority.
- *
- * This function is designed to be used with sorting algorithms such as qsort.
- *
- * @param a Pointer to the first sched_task_t object.
- * @param b Pointer to the second sched_task_t object.
- * @return Integer representing the relative priority of the two tasks.
- */
-static int sched_task_cmp(const void *a, const void *b) {
-    const sched_task_t *ta = (const sched_task_t *)a;
-    const sched_task_t *tb = (const sched_task_t *)b;
-    if (ta->priority < tb->priority) return -1;
-    if (ta->priority > tb->priority) return  1;
-    return 0;
-}
-
-/**
- * @brief Sorts the tasks in the scheduler by priority.
- * @details This function organizes the tasks in the scheduler structure in
- * descending order of priority, ensuring that higher-priority tasks are scheduled first.
- */
-static void sort_tasks_by_priority(void) {
-    qsort(sched.tasks, sched.tasks_count, sizeof(sched_task_t), sched_task_cmp);
 }
 
 int sched_init(size_t max_tasks) {
@@ -90,7 +60,7 @@ int sched_add_task(task_fn fn, void *data, uint32_t interval_ms, uint8_t priorit
 
 void sched_start(void) {
     sched.running = 1;
-    sort_tasks_by_priority();
+    sort_tasks_by_priority(&sched);
 
     while (!sched_should_exit()) {
         uint32_t now_ms = millis();
