@@ -1,41 +1,38 @@
 #include <stdio.h>
 
-#include "../src/config.h"
-#include "../src/scheduler.h"
-#include "../src/system.h"
-#include "../src/logger.h"
+#include "rjos.h"
+#include "scheduler.h"
 
-void task_1hz() {
+void task_1hz(void *args) {
     static int count = 0;
     printf("Task 1hz: %d %d\n", ++count, millis());
 }
 
-void task_2hz() {
+void task_2hz(void *args) {
     static int count = 0;
     printf("Task 2hz: %d %d\n", ++count, millis());
 }
 
 int main(void) {
-    /* System initialization. */
-    system_init();
-    logger_init("log.txt", LOG_LEVEL_DEBUG);
-
-    /* Configuration initialization. */
-    config_t config;
-    config_init(&config);
+    rjos_init("config.txt", "log.txt");
 
     /* Scheduler initialization. */
-    sched_t sched;
-    sched_init(&sched, 4);
-    sched_add_task(&sched, task_1hz, NULL, 1000, 0, "task_1hz");
-    sched_add_task(&sched, task_2hz, NULL, 2000, 0, "task_2hz");
+    sched_init(4);
 
-    sched_set_log_hook(&sched, NULL);
+    /* Add tasks to the scheduler. */
+    sched_add_task(task_1hz, NULL, 1000, 0, "task_1hz");
+    sched_add_task(task_2hz, NULL,  500, 1, "task_2hz");
+
+    /* Setup scheduler log callback and signal handlers. */
+    sched_set_log_hook(NULL);
     sched_setup_signal_handlers();
-    sched_start(&sched);
 
-    config_destroy(&config);
-    sched_destroy(&sched);
-    logger_destroy();
+    /* Start the scheduler. */
+    sched_start();
+
+    /* Release scheduler. */
+    sched_destroy();
+
+    rjos_cleanup();
     return 0;
 }

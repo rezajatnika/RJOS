@@ -3,27 +3,14 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "../src/config.h"
-#include "../src/logger.h"
-#include "../src/system.h"
-#include "../src/serial.h"
+#include "rjos.h"
+#include "serial.h"
 
 int main(void) {
-    /* System initialization. */
-    system_init();
-    logger_init("log.txt", LOG_LEVEL_DEBUG);
+    rjos_init("config.txt", "log.txt");
 
-    /* Configuration initialization. */
-    config_t config;
-    config_init(&config);
-
-    if (config_load(&config, "ex_config.txt") != 0) {
-        return -1;
-    }
-    const char *serial_device = config_get(&config, "serial_device");
-    const char *timeout_ms    = config_get(&config, "timeout_ms");
-    const char *baudrate      = config_get(&config, "baudrate");
-    const char *blocking      = config_get(&config, "blocking");
+    const char *serial_device = config_get("serial_device");
+    const char *baudrate      = config_get("baudrate");
 
     serial_t serial;
     serial_open(&serial, serial_device, atoi(baudrate));
@@ -34,6 +21,7 @@ int main(void) {
         serial_write(&serial, buf, strlen(buf));
     }
     serial_close(&serial);
-    logger_destroy();
+
+    rjos_cleanup();
     return 0;
 }

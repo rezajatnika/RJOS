@@ -38,19 +38,6 @@ typedef struct config {
 } config_t;
 
 /**
- * @brief Initializes a configuration structure.
- *
- * This function initializes a provided configuration structure, setting up its
- * internal state so that it is ready for use. The `config` parameter must point
- * to a valid `config_t` structure. After initialization, the structure will
- * contain no entries, and its memory will be properly prepared for further
- * operations.
- *
- * @param config Pointer to a `config_t` structure to be initialized.
- */
-void config_init(config_t *config);
-
-/**
  * @brief Loads configuration key-value pairs from a file into a config object.
  *
  * This function reads the specified file line-by-line, parsing each line into a key-value
@@ -60,14 +47,11 @@ void config_init(config_t *config);
  * If any line does not conform to the expected format or any error occurs during file
  * operations, the function handles such cases appropriately.
  *
- * @param config Pointer to the configuration object where the key-value pairs will be stored.
- *        The caller must ensure the configuration is properly initialized before calling.
  * @param filename Path to the configuration file to be loaded.
- *
  * @return 0 if the configuration is loaded successfully, or -1 if an error occurs (e.g., a file
  *         could not be opened or memory allocation fails).
  */
-int config_load(config_t *config, const char *filename);
+int config_load(const char *filename);
 
 /**
  * @brief Retrieves the value associated with a specified key from the configuration.
@@ -76,20 +60,17 @@ int config_load(config_t *config, const char *filename);
  * and returns its associated value. If the key is not found in the configuration,
  * or if either the config or key parameter is NULL, the function returns NULL.
  *
- * @param config Pointer to the configuration structure to search in.
  * @param key The key whose value is to be retrieved.
  * @return The value associated with the key if found, NULL otherwise.
  */
-const char *config_get(config_t *config, const char *key);
+const char *config_get(const char *key);
 
 /**
  * @brief Frees the resources associated with a configuration object.
  *
  * This function releases the memory allocated for the configuration entries
  * and resets the configuration object to an empty state.
- *
- * @param config Pointer to the configuration object to be destroyed.
  */
-void config_destroy(config_t *config);
+void config_destroy(void);
 
 #endif

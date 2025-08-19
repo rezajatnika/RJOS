@@ -1,12 +1,15 @@
 #include "logger.h"
 #include "scheduler.h"
 #include "system.h"
+#include "util/sched_util.h"
 
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+
+static sched_t sched = { NULL, 0, 0, 0, NULL };
 
 /**
  * @brief Indicates if a shutdown has been requested.
@@ -27,57 +30,24 @@ static void handle_signal(int sig) {
     shutdown_requested = 1;
 }
 
-/**
- * @brief Comparison function for sorting scheduler tasks by priority.
- * @details Compares two scheduler task objects by their priority values.
- * The function returns:
- * - A negative value if the priority of the first task is less than the second.
- * - A positive value if the priority of the first task is greater than the second.
- * - Zero if both tasks have the same priority.
- *
- * This function is designed to be utilized with sorting algorithms such as qsort.
- *
- * @param a Pointer to the first sched_task_t object.
- * @param b Pointer to the second sched_task_t object.
- * @return Integer representing the relative priority of the two tasks.
- */
-static int sched_task_cmp(const void *a, const void *b) {
-    const sched_task_t *ta = (const sched_task_t *)a;
-    const sched_task_t *tb = (const sched_task_t *)b;
-    if (ta->priority < tb->priority) return -1;
-    if (ta->priority > tb->priority) return  1;
-    return 0;
-}
-
-/**
- * @brief Sorts the tasks in the scheduler by priority.
- * @details This function organizes the tasks in the scheduler structure in
- * descending order of priority, ensuring that higher-priority tasks are scheduled first.
- *
- * @param sched Pointer to the scheduler structure that contains the task list to be sorted.
- */
-static void sort_tasks_by_priority(sched_t *sched) {
-    qsort(sched->tasks, sched->tasks_count, sizeof(sched_task_t), sched_task_cmp);
-}
-
-int sched_init(sched_t *sched, size_t max_tasks) {
-    sched->tasks = calloc(max_tasks, sizeof(sched_task_t));
-    if (!sched->tasks) {
+int sched_init(size_t max_tasks) {
+    sched.tasks = calloc(max_tasks, sizeof(sched_task_t));
+    if (!sched.tasks) {
         logger_log(LOG_LEVEL_ERROR, "Failed to allocate memory for scheduler tasks.");
         return -1;
     }
-    sched->max_tasks = max_tasks;
-    sched->tasks_count = 0;
-    sched->running = 0;
+    sched.max_tasks = max_tasks;
+    sched.tasks_count = 0;
+    sched.running = 0;
     return 0;
 }
 
-int sched_add_task(sched_t *sched, task_fn fn, void *data, uint32_t interval_ms, uint8_t priority, const char *name) {
-    if (!sched || !fn || sched->tasks_count >= sched->max_tasks) {
+int sched_add_task(task_fn fn, void *data, uint32_t interval_ms, uint8_t priority, const char *name) {
+    if (!fn || sched.tasks_count >= sched.max_tasks) {
         logger_log(LOG_LEVEL_ERROR, "Failed to add task to scheduler: %s.", name);
         return -1;
     }
-    sched_task_t *task = &sched->tasks[sched->tasks_count++];
+    sched_task_t *task = &sched.tasks[sched.tasks_count++];
     task->callback = fn;
     task->data = data;
     task->name = strdup(name);
@@ -88,16 +58,16 @@ int sched_add_task(sched_t *sched, task_fn fn, void *data, uint32_t interval_ms,
     return 0;
 }
 
-void sched_start(sched_t *sched) {
-    sched->running = 1;
-    sort_tasks_by_priority(sched);
+void sched_start(void) {
+    sched.running = 1;
+    sort_tasks_by_priority(&sched);
 
     while (!sched_should_exit()) {
         uint32_t now_ms = millis();
         uint32_t next_due_ms = UINT32_MAX;
 
-        for (size_t i = 0; i < sched->tasks_count; i++) {
-            sched_task_t *task = &sched->tasks[i];
+        for (size_t i = 0; i < sched.tasks_count; i++) {
+            sched_task_t *task = &sched.tasks[i];
 
             uint32_t elapsed_ms = now_ms - task->last_run_ms;
             if (elapsed_ms >= task->interval_ms) {
@@ -117,12 +87,13 @@ void sched_start(sched_t *sched) {
                 /* Overrun detection. */
                 if (millis() > task->deadline_ms) {
                     task->overrun_count++;
-                    logger_log(LOG_LEVEL_INFO, "Task %s exceeded deadline by %ums.", task->name, millis() - task->deadline_ms);
+                    logger_log(LOG_LEVEL_INFO, "Task %s exceeded deadline by %ums.",
+                        task->name, millis() - task->deadline_ms);
                 }
 
                 /* Call the logging hook if set. */
-                if (sched->log_hook) {
-                    sched->log_hook(i, task->data);
+                if (sched.log_hook) {
+                    sched.log_hook(i, task->data);
                 }
             } else {
                 uint32_t diff_ms = task->interval_ms - elapsed_ms;
@@ -142,24 +113,22 @@ void sched_start(sched_t *sched) {
     }
 }
 
-void sched_stop(sched_t *sched) {
-    sched->running = 0;
+void sched_stop(void) {
+    sched.running = 0;
 }
 
-void sched_destroy(sched_t *sched) {
-    for (size_t i = 0; i < sched->tasks_count; ++i) {
-        free(sched->tasks[i].name);
+void sched_destroy(void) {
+    for (size_t i = 0; i < sched.tasks_count; ++i) {
+        free(sched.tasks[i].name);
     }
-    free(sched->tasks);
-    sched->tasks = NULL;
-    sched->max_tasks   = 0;
-    sched->tasks_count = 0;
+    free(sched.tasks);
+    sched.tasks = NULL;
+    sched.max_tasks   = 0;
+    sched.tasks_count = 0;
 }
 
-void sched_set_log_hook(sched_t *sched, sched_log_fn log_hook) {
-    if (sched) {
-        sched->log_hook = log_hook;
-    }
+void sched_set_log_hook(sched_log_fn log_hook) {
+    sched.log_hook = log_hook;
 }
 
 int sched_should_exit(void) {
