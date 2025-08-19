@@ -2,7 +2,6 @@
 #define RJOS_SCHEDULER_H
 
 #include <stdint.h>
-#include <stddef.h>
 
 typedef void (*task_fn)(void *data);
 typedef void (*sched_log_fn)(size_t idx, void *data);
@@ -38,16 +37,14 @@ typedef struct sched {
 /**
  * Initializes a scheduler instance with a specified maximum number of tasks.
  *
- * @param sched A pointer to the scheduler instance to initialize.
  * @param max_tasks The maximum number of tasks the scheduler can handle concurrently.
  * @return Returns 0 on successful initialization. Returns -1 if an error occurs, such as memory allocation failure.
  */
-int sched_init(sched_t *sched, size_t max_tasks);
+int sched_init(size_t max_tasks);
 
 /**
  * Adds a new task to the scheduler.
  *
- * @param sched Pointer to the scheduler instance where the task will be added.
  * @param fn Function pointer representing the task to be executed.
  * @param data Pointer to the data that will be passed to the task's function.
  * @param interval_ms Execution interval for the task in milliseconds.
@@ -55,7 +52,7 @@ int sched_init(sched_t *sched, size_t max_tasks);
  * @param name Name of the task for identification purposes.
  * @return Returns 0 on success, or -1 on failure (e.g., if the scheduler is null, the function pointer is null, or the task limit is reached).
  */
-int sched_add_task(sched_t *sched, task_fn fn, void *data, uint32_t interval_ms, uint8_t priority, const char *name);
+int sched_add_task(task_fn fn, void *data, uint32_t interval_ms, uint8_t priority, const char *name);
 
 /**
  * Starts the scheduler, managing tasks execution and priority.
@@ -64,32 +61,25 @@ int sched_add_task(sched_t *sched, task_fn fn, void *data, uint32_t interval_ms,
  * and execute tasks. Tasks are processed according to their priority and
  * interval timing. The function remains in a loop, continuously checking
  * for tasks to execute until an exit condition is triggered.
- *
- * @param sched Pointer to the scheduler instance to start.
  */
-void sched_start(sched_t *sched);
+void sched_start(void);
 
 /**
  * Stops the scheduler by setting its running state to false.
- *
- * @param sched Pointer to the scheduler instance to be stopped.
  */
-void sched_stop(sched_t *sched);
+void sched_stop(void);
 
 /**
  * Destroys the scheduler and releases any allocated resources.
- *
- * @param sched Pointer to the scheduler instance to be destroyed.
  */
-void sched_destroy(sched_t *sched);
+void sched_destroy(void);
 
 /**
  * Sets a logging hook for the scheduler to allow tracking or debugging.
  *
- * @param sched Pointer to the scheduler instance.
  * @param log_hook Function pointer to the log hook to be used for logging task-related events.
  */
-void sched_set_log_hook(sched_t *sched, sched_log_fn log_hook);
+void sched_set_log_hook(sched_log_fn log_hook);
 
 /**
  * Checks if the scheduler should exit.

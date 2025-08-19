@@ -26,16 +26,16 @@ int main(void) {
 
     /* Scheduler initialization. */
     sched_t sched;
-    sched_init(&sched, 4);
-    sched_add_task(&sched, task_1hz, NULL, 1000, 0, "task_1hz");
-    sched_add_task(&sched, task_2hz, NULL, 2000, 0, "task_2hz");
+    sched_init(4);
+    sched_add_task(task_1hz, NULL, 1000, 0, "task_1hz");
+    sched_add_task(task_2hz, NULL, 2000, 0, "task_2hz");
 
-    sched_set_log_hook(&sched, NULL);
+    sched_set_log_hook(NULL);
     sched_setup_signal_handlers();
-    sched_start(&sched);
+    sched_start();
 
     config_destroy(&config);
-    sched_destroy(&sched);
+    sched_destroy();
     logger_destroy();
     return 0;
 }
