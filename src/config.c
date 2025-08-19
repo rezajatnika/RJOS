@@ -4,13 +4,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-void config_init(config_t *config) {
-    config->entries     = NULL;
-    config->num_entries = 0;
-    pthread_mutex_init(&config->mutex, NULL);
-}
+static config_t config = {NULL, PTHREAD_MUTEX_INITIALIZER, 0 };
 
-int config_load(config_t *config, const char *filename) {
+int config_load(const char *filename) {
     FILE *fp = fopen(filename, "r");
     if (!fp) {
         perror("config_load: fopen");
@@ -36,13 +32,13 @@ int config_load(config_t *config, const char *filename) {
         if (newline) {
             *newline = '\0';
         }
-        config_entry_t *temp = realloc(config->entries, (config->num_entries + 1) * sizeof(config_entry_t));
+        config_entry_t *temp = realloc(config.entries, (config.num_entries + 1) * sizeof(config_entry_t));
         if (!temp) {
             fclose(fp);
             perror("config_load: realloc");
             return -1;
         }
-        config->entries = temp;
+        config.entries = temp;
 
         if (strlen(key) >= CONFIG_MAX_KEY_LEN) {
             perror("config_load: key too long");
@@ -52,31 +48,31 @@ int config_load(config_t *config, const char *filename) {
         }
 
         /* Add the key-value pair to the configuration. */
-        strncpy(config->entries[config->num_entries].key, key, CONFIG_MAX_KEY_LEN - 1);
-        strncpy(config->entries[config->num_entries].val, val, CONFIG_MAX_VAL_LEN - 1);
-        config->entries[config->num_entries].key[CONFIG_MAX_KEY_LEN - 1] = '\0';
-        config->entries[config->num_entries].val[CONFIG_MAX_VAL_LEN - 1] = '\0';
-        config->num_entries++;
+        strncpy(config.entries[config.num_entries].key, key, CONFIG_MAX_KEY_LEN - 1);
+        strncpy(config.entries[config.num_entries].val, val, CONFIG_MAX_VAL_LEN - 1);
+        config.entries[config.num_entries].key[CONFIG_MAX_KEY_LEN - 1] = '\0';
+        config.entries[config.num_entries].val[CONFIG_MAX_VAL_LEN - 1] = '\0';
+        config.num_entries++;
     }
     fclose(fp);
     return 0;
 }
 
-const char *config_get(config_t *config, const char *key) {
-    pthread_mutex_lock(&config->mutex);
-    for (size_t i = 0; i < config->num_entries; ++i) {
-        if (strcmp(config->entries[i].key, key) == 0) {
-            pthread_mutex_unlock(&config->mutex);
-            return config->entries[i].val;
+const char *config_get(const char *key) {
+    pthread_mutex_lock(&config.mutex);
+    for (size_t i = 0; i < config.num_entries; ++i) {
+        if (strcmp(config.entries[i].key, key) == 0) {
+            pthread_mutex_unlock(&config.mutex);
+            return config.entries[i].val;
         }
     }
-    pthread_mutex_unlock(&config->mutex);
+    pthread_mutex_unlock(&config.mutex);
     return NULL; /* Key not found. */
 }
 
-void config_destroy(config_t *config) {
-    free(config->entries);
-    pthread_mutex_destroy(&config->mutex);
-    config->entries = NULL;
-    config->num_entries = 0;
+void config_destroy(void) {
+    free(config.entries);
+    pthread_mutex_destroy(&config.mutex);
+    config.entries = NULL;
+    config.num_entries = 0;
 }
