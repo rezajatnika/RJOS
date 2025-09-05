@@ -1,6 +1,4 @@
 #include "rjos.h"
-
-#include <stdio.h>
 #include <stdlib.h>
 
 void rjos_init(const char *config_file, char *log_file) {

@@ -1,14 +1,14 @@
-#include "serial.h"
 #include "logger.h"
+#include "serial.h"
 #include "util/net_util.h"
 
 #include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <termios.h>
-#include <unistd.h>
 #include <string.h>
 #include <sys/ioctl.h>
+#include <termios.h>
+#include <unistd.h>
 
 static int set_nonblocking_flag(int fd, int enable) {
     int flags = fcntl(fd, F_GETFL);

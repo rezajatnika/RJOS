@@ -1,8 +1,8 @@
 #ifndef RJOS_LOGGER_H
 #define RJOS_LOGGER_H
 
-#include <stdio.h>
 #include <pthread.h>
+#include <stdio.h>
 
 #define LOG_LEVEL_DEBUG 0
 #define LOG_LEVEL_INFO  1

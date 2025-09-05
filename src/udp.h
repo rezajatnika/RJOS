@@ -1,7 +1,6 @@
 #ifndef RJOS_UDP_H
 #define RJOS_UDP_H
 
-#include <stddef.h>
 #include <stdint.h>
 
 #define UDP_MAX_PAYLOAD 256

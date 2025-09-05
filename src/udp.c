@@ -1,13 +1,13 @@
-#include "udp.h"
 #include "logger.h"
+#include "udp.h"
 #include "util/net_util.h"
 
+#include <arpa/inet.h>
 #include <netdb.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
-#include <arpa/inet.h>
 #include <sys/socket.h>
+#include <unistd.h>
 
 int udp_init(udp_t *udp, const char *host, uint16_t port) {
     if (!udp || !host) {

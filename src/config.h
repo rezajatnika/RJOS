@@ -1,8 +1,8 @@
 #ifndef RJOS_CONFIG_H
 #define RJOS_CONFIG_H
 
-#include <stddef.h>
 #include <pthread.h>
+#include <stddef.h>
 
 #define CONFIG_MAX_KEY_LEN 128
 #define CONFIG_MAX_VAL_LEN 256

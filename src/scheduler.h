@@ -2,7 +2,6 @@
 #define RJOS_SCHEDULER_H
 
 #include <stdint.h>
-#include <stddef.h>
 
 typedef void (*task_fn)(void *data);
 typedef void (*sched_log_fn)(size_t idx, void *data);

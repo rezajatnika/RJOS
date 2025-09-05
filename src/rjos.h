@@ -3,7 +3,7 @@
 
 #include "config.h"
 #include "logger.h"
-#include "rjos.h""
+#include "rjos.h"
 #include "system.h"
 
 /**
