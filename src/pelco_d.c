@@ -1,10 +1,51 @@
 #include "pelco_d.h"
 
+/**
+ * @brief Calculates the checksum for a given Pelco-D message.
+ *
+ * The checksum is computed as the sum of the message's address, command1, command2,
+ * data1, and data2 fields, modulo 256.
+ *
+ * @param msg A pointer to the Pelco-D message structure. If the pointer is NULL,
+ *        the function returns 0.
+ * @return The calculated checksum as an 8-bit unsigned integer. Returns 0 if the
+ *         input message pointer is NULL.
+ */
 uint8_t pelco_d_checksum(const pelco_d_message_t *msg) {
     if (!msg) {
         return 0;
     }
     return (msg->address + msg->command1 + msg->command2 + msg->data1 + msg->data2) % 256;
+}
+
+pelco_d_error_t pelco_get_pan_angle(pelco_d_message_t *msg, int *pan) {
+    if (!msg) {
+        return PELCO_D_ERROR_NULL_POINTER;
+    }
+    if (msg->command2 != 0x59) {
+        return PELCO_D_ERROR_CHECKSUM;
+    }
+    int angle = (msg->data1 * 256 + msg->data2) / 100;
+    *pan = angle;
+    return PELCO_D_SUCCESS;
+}
+
+pelco_d_error_t pelco_get_tilt_angle(pelco_d_message_t *msg, int *tilt) {
+    if (!msg) {
+        return PELCO_D_ERROR_NULL_POINTER;
+    }
+    if (msg->command2 != 0x5B) {
+        return PELCO_D_ERROR_CHECKSUM;
+    }
+    int tilt_data = msg->data1 * 256 + msg->data2;
+    int angle = 0;
+    if (tilt_data > 18000) {
+        angle = (36000 - tilt_data) / 100;
+    } else if (tilt_data < 18000) {
+        angle = -tilt_data / 100;
+    }
+    *tilt = angle;
+    return PELCO_D_SUCCESS;
 }
 
 pelco_d_error_t pelco_d_create_message(pelco_d_message_t *msg,
