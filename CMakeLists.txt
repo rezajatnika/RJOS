@@ -14,6 +14,7 @@ set(CORE_SOURCES
         src/config.c
         src/ipc.c
         src/logger.c
+        src/pelco_d.c
         src/rjos.c
         src/scheduler.c
         src/serial.c
@@ -27,6 +28,7 @@ set(CORE_HEADERS
         src/config.h
         src/ipc.h
         src/logger.h
+        src/pelco_d.h
         src/rjos.h
         src/scheduler.h
         src/serial.h

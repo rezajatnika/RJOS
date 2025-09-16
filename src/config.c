@@ -7,6 +7,11 @@
 static config_t config = {NULL, PTHREAD_MUTEX_INITIALIZER, 0 };
 
 int config_load(const char *filename) {
+    if (!filename) {
+        perror("config_load: invalid arguments");
+        return -1;
+    }
+
     FILE *fp = fopen(filename, "r");
     if (!fp) {
         perror("config_load: fopen");
@@ -19,14 +24,31 @@ int config_load(const char *filename) {
             continue;
         }
 
-        char *equal_sign = strchr(line, '=');
+        /* Trim whitespace from the beginning. */
+        char *start = line;
+        while (*start == ' ' || *start == '\t') {
+            start++;
+        }
+
+        char *equal_sign = strchr(start, '=');
         if (!equal_sign) {
             fprintf(stderr, "config_load: invalid line: %s\n", line);
             continue;
         }
         *equal_sign = '\0';
-        const char *key = line;
+        const char *key = start;
         const char *val = equal_sign + 1;
+
+        /* Trim trailing whitespace from key. */
+        char *key_end = equal_sign - 1;
+        while (key_end >= key && (*key_end == ' ' || *key_end == '\t')) {
+            *key_end-- = '\0';
+        }
+
+        /* Trim whitespace from the end of the value. */
+        while (*val == ' ' || *val == '\t') {
+            val++;
+        }
 
         char *newline = strchr(val, '\n');
         if (newline) {
