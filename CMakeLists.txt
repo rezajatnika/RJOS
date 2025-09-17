@@ -12,9 +12,12 @@ set(CMAKE_C_STANDARD 11)
 # Define the source files for the core library.
 set(CORE_SOURCES
         src/config.c
+        src/datpro.c
         src/ipc.c
         src/logger.c
         src/pelco_d.c
+        src/pelco_d_parser.c
+        src/ptu.c
         src/rjos.c
         src/scheduler.c
         src/serial.c
@@ -26,9 +29,13 @@ set(CORE_SOURCES
 
 set(CORE_HEADERS
         src/config.h
+        src/datpro.h
         src/ipc.h
         src/logger.h
+        src/macros.h
+        src/ptu.h
         src/pelco_d.h
+        src/pelco_d_parser.h
         src/rjos.h
         src/scheduler.h
         src/serial.h
@@ -66,3 +73,6 @@ target_link_libraries(rjos_ipc PRIVATE rjos)
 
 add_executable(rjos_logger example/main_logger.c)
 target_link_libraries(rjos_logger PRIVATE rjos)
+
+add_executable(main src/main_controller.c)
+target_link_libraries(main PRIVATE rjos)

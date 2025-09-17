@@ -5,74 +5,70 @@
  *
  * The checksum is computed as the sum of the message's address, command1, command2,
  * data1, and data2 fields, modulo 256.
- *
- * @param msg A pointer to the Pelco-D message structure. If the pointer is NULL,
- *        the function returns 0.
- * @return The calculated checksum as an 8-bit unsigned integer. Returns 0 if the
- *         input message pointer is NULL.
  */
-uint8_t pelco_d_checksum(const pelco_d_message_t *msg) {
+uint8_t pd_checksum(const pd_msg_t *msg) {
     if (!msg) {
         return 0;
     }
     return (msg->address + msg->command1 + msg->command2 + msg->data1 + msg->data2) % 256;
 }
 
-pelco_d_error_t pelco_get_pan_angle(pelco_d_message_t *msg, int *pan) {
+void into_bytes(uint16_t val, uint8_t *b1, uint8_t *b2) {
+    *b1 = (val >> 8) & 0xFF;
+    *b2 = (val     ) & 0xFF;
+}
+
+pd_err_t pd_get_pan_angle(pd_msg_t *msg, int *pan) {
     if (!msg) {
         return PELCO_D_ERROR_NULL_POINTER;
     }
     if (msg->command2 != 0x59) {
         return PELCO_D_ERROR_CHECKSUM;
     }
-    int angle = (msg->data1 * 256 + msg->data2) / 100;
+    const int angle = (msg->data1 * 256 + msg->data2) / 100;
     *pan = angle;
     return PELCO_D_SUCCESS;
 }
 
-pelco_d_error_t pelco_get_tilt_angle(pelco_d_message_t *msg, int *tilt) {
+pd_err_t pd_get_tilt_angle(pd_msg_t *msg, int *tilt) {
+    int angle = 0;
+
     if (!msg) {
         return PELCO_D_ERROR_NULL_POINTER;
     }
     if (msg->command2 != 0x5B) {
         return PELCO_D_ERROR_CHECKSUM;
     }
-    int tilt_data = msg->data1 * 256 + msg->data2;
-    int angle = 0;
+    const int tilt_data = msg->data1 * 256 + msg->data2;
     if (tilt_data > 18000) {
         angle = (36000 - tilt_data) / 100;
     } else if (tilt_data < 18000) {
-        angle = -tilt_data / 100;
+        angle = -(tilt_data / 100);
     }
     *tilt = angle;
     return PELCO_D_SUCCESS;
 }
 
-pelco_d_error_t pelco_d_create_message(pelco_d_message_t *msg,
-    uint8_t address,
-    uint8_t command1,
-    uint8_t command2,
-    uint8_t data1,
-    uint8_t data2) {
+pd_err_t pd_create_message(pd_msg_t *msg, uint8_t addr, uint8_t cmd1, uint8_t cmd2, uint8_t data1, uint8_t data2) {
     if (!msg) {
         return PELCO_D_ERROR_NULL_POINTER;
     }
-    if (address > PELCO_D_MAX_ADDRESS) {
+    if (addr > PELCO_D_MAX_ADDRESS) {
         return PELCO_D_ERROR_INVALID_ADDRESS;
     }
 
     msg->sync = PELCO_D_SYNC_BYTE;
-    msg->address = address;
-    msg->command1 = command1;
-    msg->command2 = command2;
+    msg->address = addr;
+    msg->command1 = cmd1;
+    msg->command2 = cmd2;
     msg->data1 = data1;
     msg->data2 = data2;
-    msg->checksum = pelco_d_checksum(msg);
+    msg->checksum = pd_checksum(msg);
 
     return PELCO_D_SUCCESS;
 }
 
-pelco_d_error_t pelco_d_validate_message(const pelco_d_message_t *msg) {
+pd_err_t pd_validate_message(const pd_msg_t *msg) {
     if (!msg) {
         return PELCO_D_ERROR_NULL_POINTER;
     }
@@ -82,66 +78,76 @@ pelco_d_error_t pelco_d_validate_message(const pelco_d_message_t *msg) {
     if (msg->address > PELCO_D_MAX_ADDRESS) {
         return PELCO_D_ERROR_INVALID_ADDRESS;
     }
-    uint8_t checksum = pelco_d_checksum(msg);
+    uint8_t checksum = pd_checksum(msg);
     if (checksum != msg->checksum) {
         return PELCO_D_ERROR_CHECKSUM;
     }
     return PELCO_D_SUCCESS;
 }
 
-pelco_d_error_t pelco_d_pan_tilt(pelco_d_message_t *msg,
-    uint8_t address,
-    pelco_d_pan_direction_t pan_dir,
-    uint8_t pan_speed,
-    pelco_d_tilt_direction_t tilt_dir,
-    uint8_t tilt_speed) {
+pd_err_t pd_mv_pan(pd_msg_t *msg, uint8_t addr, pd_pan_dir_t dir, uint8_t spd) {
     if (!msg) {
         return PELCO_D_ERROR_NULL_POINTER;
     }
-    if (address > PELCO_D_MAX_ADDRESS) {
+    if (addr > PELCO_D_MAX_ADDRESS) {
         return PELCO_D_ERROR_INVALID_ADDRESS;
     }
-    if (pan_speed > PELCO_D_MAX_SPEED || tilt_speed > PELCO_D_MAX_SPEED) {
+    if (spd > PELCO_D_MAX_SPEED) {
         return PELCO_D_ERROR_INVALID_SPEED;
     }
 
     uint8_t cmd1 = 0x00;
     uint8_t cmd2 = 0x00;
 
-    switch (pan_dir) {
+    switch (dir) {
         case PELCO_D_PAN_LEFT:
-            cmd2 |= PELCO_D_CMD2_PAN_LEFT;
+            cmd2 = PELCO_D_CMD2_PAN_LEFT;
             break;
         case PELCO_D_PAN_RIGHT:
-            cmd2 |= PELCO_D_CMD2_PAN_RIGHT;
+            cmd2 = PELCO_D_CMD2_PAN_RIGHT;
             break;
         case PELCO_D_PAN_STOP:
         default:
             break;
     }
 
-    switch (tilt_dir) {
+    return pd_create_message(msg, addr, cmd1, cmd2, 0x00, spd);
+}
+
+pd_err_t pd_mv_tilt(pd_msg_t *msg, uint8_t addr, pd_tilt_dir_t dir, uint8_t spd) {
+    if (!msg) {
+        return PELCO_D_ERROR_NULL_POINTER;
+    }
+    if (addr > PELCO_D_MAX_ADDRESS) {
+        return PELCO_D_ERROR_INVALID_ADDRESS;
+    }
+    if (spd > PELCO_D_MAX_SPEED) {
+        return PELCO_D_ERROR_INVALID_SPEED;
+    }
+    uint8_t cmd1 = 0x00;
+    uint8_t cmd2 = 0x00;
+
+    switch (dir) {
         case PELCO_D_TILT_UP:
-            cmd2 |= PELCO_D_CMD2_TILT_UP;
+            cmd2 = PELCO_D_CMD2_TILT_UP;
             break;
         case PELCO_D_TILT_DOWN:
-            cmd2 |= PELCO_D_CMD2_TILT_DOWN;
+            cmd2 = PELCO_D_CMD2_TILT_DOWN;
             break;
         case PELCO_D_TILT_STOP:
-        default:
             break;
     }
 
-    return pelco_d_create_message(msg, address, cmd1, cmd2, pan_speed, tilt_speed);
+    return pd_create_message(msg, addr, cmd1, cmd2, 0x00, spd);
 }
 
-pelco_d_error_t pelco_d_zoom(pelco_d_message_t *msg, uint8_t address, pelco_d_zoom_direction_t direction) {
+pd_err_t pd_zoom(pd_msg_t *msg, uint8_t addr, pd_zoom_dir_t dir) {
     if (!msg) {
         return PELCO_D_ERROR_NULL_POINTER;
     }
     uint8_t cmd1 = 0x00;
     uint8_t cmd2 = 0x00;
-    switch (direction) {
+    switch (dir) {
         case PELCO_D_ZOOM_WIDE:
             cmd2 |= PELCO_D_CMD2_ZOOM_WIDE;
             break;
@@ -153,10 +159,10 @@ pelco_d_error_t pelco_d_zoom(pelco_d_message_t *msg, uint8_t address, pelco_d_zo
             break;
     }
 
-    return pelco_d_create_message(msg, address, cmd1, cmd2, 0x00, 0x00);
+    return pd_create_message(msg, addr, cmd1, cmd2, 0x00, 0x00);
 }
 
-pelco_d_error_t pelco_d_query_position(pelco_d_message_t *msg, uint8_t address, pelco_d_query_pos_t query_pos) {
+pd_err_t pd_query_pos(pd_msg_t *msg, uint8_t addr, pd_query_pos_t query_pos) {
     if (!msg) {
         return PELCO_D_ERROR_NULL_POINTER;
     }
@@ -172,10 +178,36 @@ pelco_d_error_t pelco_d_query_position(pelco_d_message_t *msg, uint8_t address, 
         default:
             break;
     }
-    return pelco_d_create_message(msg, address, cmd1, cmd2, 0x00, 0x00);
+    return pd_create_message(msg, addr, cmd1, cmd2, 0x00, 0x00);
 }
 
-void pelco_d_print_message(const pelco_d_message_t *msg) {
+pd_err_t pd_set_pan(pd_msg_t *msg, uint8_t addr, int angle) {
+    if (!msg) {
+        return PELCO_D_ERROR_NULL_POINTER;
+    }
+    if (addr > PELCO_D_MAX_ADDRESS) {
+        return PELCO_D_ERROR_INVALID_ADDRESS;
+    }
+    uint8_t data1, data2;
+    into_bytes(angle, &data1, &data2);
+
+    return pd_create_message(msg, addr, 0x00, 0x4B, data1, data2);
+}
+
+pd_err_t pd_set_tilt(pd_msg_t *msg, uint8_t addr, int angle) {
+    if (!msg) {
+        return PELCO_D_ERROR_NULL_POINTER;
+    }
+    if (addr > PELCO_D_MAX_ADDRESS) {
+        return PELCO_D_ERROR_INVALID_ADDRESS;
+    }
+    uint8_t data1, data2;
+    into_bytes(angle, &data1, &data2);
+
+    return pd_create_message(msg, addr, 0x00, 0x4B, data1, data2);
+}
+
+void pd_print_msg(const pd_msg_t *msg) {
     if (!msg) {
         printf("NULL pelco_d message.\n");
         return;
@@ -184,7 +216,7 @@ void pelco_d_print_message(const pelco_d_message_t *msg) {
         msg->sync, msg->address, msg->command1, msg->command2, msg->data1, msg->data2, msg->checksum);
 }
 
-pelco_d_error_t pelco_d_bytes_to_message(const uint8_t *buff, size_t size, pelco_d_message_t *msg) {
+pd_err_t pd_pack_bytes(const uint8_t *buff, size_t size, pd_msg_t *msg) {
     if (!buff || !msg) {
         return PELCO_D_ERROR_NULL_POINTER;
     }
@@ -199,10 +231,10 @@ pelco_d_error_t pelco_d_bytes_to_message(const uint8_t *buff, size_t size, pelco
     msg->data2 = buff[5];
     msg->checksum = buff[6];
 
-    return pelco_d_checksum(msg);
+    return pd_checksum(msg);
 }
 
-pelco_d_error_t pelco_d_message_to_bytes(const pelco_d_message_t *msg, uint8_t *buff, size_t size) {
+pd_err_t pd_pack_message(const pd_msg_t *msg, uint8_t *buff, size_t size) {
     if (!msg || !buff) {
         return PELCO_D_ERROR_NULL_POINTER;
     }
@@ -219,7 +251,7 @@ pelco_d_error_t pelco_d_message_to_bytes(const pelco_d_message_t *msg, uint8_t *
     return PELCO_D_SUCCESS;
 }
 
-void pelco_d_print_bytes(const uint8_t *buff, size_t size) {
+void pd_print_bytes(const uint8_t *buff, size_t size) {
     if (!buff) {
         printf("NULL pelco_d bytes.\n");
         return;

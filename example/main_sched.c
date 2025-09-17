@@ -4,23 +4,23 @@
 #include "rjos.h"
 #include "scheduler.h"
 
-pelco_d_message_t pmsg;
+pd_msg_t pmsg;
 
 void task_1hz1(void *args) {
-    pelco_d_query_position(&pmsg, 0x01, PELCO_D_PAN);
-    pelco_d_print_message(&pmsg);
+    pd_query_pos(&pmsg, 0x01, PELCO_D_PAN);
+    pd_print_msg(&pmsg);
 }
 
 void task_1hz2(void *args) {
-    pelco_d_query_position(&pmsg, 0x01, PELCO_D_TILT);
-    pelco_d_print_message(&pmsg);
+    pd_query_pos(&pmsg, 0x01, PELCO_D_TILT);
+    pd_print_msg(&pmsg);
 }
 
 void task_1hz3(void *args) {
     uint8_t buff[7];
-    pelco_d_create_message(&pmsg, 0x01, 0x00, 0x00, 0x00, 0x00);
-    pelco_d_message_to_bytes(&pmsg, buff, 7);
-    pelco_d_print_bytes(buff, 7);
+    pd_set_pan(&pmsg, 0x01, 9000);
+    pd_pack_message(&pmsg, buff, 7);
+    pd_print_bytes(buff, 7);
 }
 
 int main(void) {
@@ -30,9 +30,9 @@ int main(void) {
     sched_init(4);
 
     /* Add tasks to the scheduler. */
-    sched_add_task(task_1hz1, NULL, 1000, 0, "task_1hz");
-    sched_add_task(task_1hz2, NULL, 1000, 0, "task_1hz");
-    sched_add_task(task_1hz3, NULL, 1000, 0, "task_1hz");
+    //sched_add_task(task_1hz1, NULL, 1000, 1, "task_1hz");
+    //sched_add_task(task_1hz2, NULL, 1000, 2, "task_1hz");
+    sched_add_task(task_1hz3, NULL, 1000, 3, "task_1hz");
 
     /* Setup scheduler log callback and signal handlers. */
     sched_set_log_hook(NULL);
