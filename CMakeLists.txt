@@ -1,5 +1,5 @@
-cmake_minimum_required(VERSION 3.31)
-project(RJOS C)
+cmake_minimum_required(VERSION 3.21)
+project(RJOS)
 
 # Set the C Standard
 # https://www.open-std.org/jtc1/sc22/wg14/www/docs/n1548.pdf

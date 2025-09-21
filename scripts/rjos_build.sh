@@ -25,12 +25,12 @@ build_project() {
 }
 
 # Ensure required tools are installed
-if ! command -v cmake &>/dev/null; then
+if ! [ "command -v cmake &>/dev/null" ]; then
   echo "Error: cmake is not installed or not in PATH."
   exit 1
 fi
 
-if ! command -v ninja &>/dev/null; then
+if ! [ "command -v ninja &>/dev/null" ]; then
   echo "Error: ninja is not installed or not in PATH."
   exit 1
 fi
