@@ -55,6 +55,7 @@ add_library(rjos STATIC
 )
 
 include_directories("src")
+include_directories("include")
 
 add_executable(rjos_config example/main_config.c)
 target_link_libraries(rjos_config PRIVATE rjos)
