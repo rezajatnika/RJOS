@@ -75,5 +75,6 @@ target_link_libraries(rjos_ipc PRIVATE rjos)
 add_executable(rjos_logger example/main_logger.c)
 target_link_libraries(rjos_logger PRIVATE rjos)
 
-add_executable(main src/main_controller.c)
-target_link_libraries(main PRIVATE rjos)
+target_link_libraries(main PRIVATE rjos zmq)
+
+set_property(TARGET main PROPERTY CXX_STANDARD 20)
