@@ -1,5 +1,5 @@
-cmake_minimum_required(VERSION 3.31)
-project(RJOS C)
+cmake_minimum_required(VERSION 3.21)
+project(RJOS)
 
 # Set the C Standard
 # https://www.open-std.org/jtc1/sc22/wg14/www/docs/n1548.pdf
@@ -55,6 +55,7 @@ add_library(rjos STATIC
 )
 
 include_directories("src")
+include_directories("include")
 
 add_executable(rjos_config example/main_config.c)
 target_link_libraries(rjos_config PRIVATE rjos)
@@ -74,5 +75,12 @@ target_link_libraries(rjos_ipc PRIVATE rjos)
 add_executable(rjos_logger example/main_logger.c)
 target_link_libraries(rjos_logger PRIVATE rjos)
 
-add_executable(main src/main_controller.c)
-target_link_libraries(main PRIVATE rjos)
+add_executable(main src/main_controller.c
+                src/main.cpp
+                src/rcws/base.cpp
+                src/rcws/handler.c
+                )
+
+target_link_libraries(main PRIVATE rjos zmq)
+
+set_property(TARGET main PROPERTY CXX_STANDARD 20)
